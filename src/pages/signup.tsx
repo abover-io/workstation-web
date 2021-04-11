@@ -19,18 +19,18 @@ import {
 } from '@material-ui/icons';
 
 import { Layout } from '@/components';
-import { userAPI, CustomValidator } from '@/utils';
+import { userAPI, Validator } from '@/utils';
 import {
   ISignUpData,
   ISignUpValidations,
   ISnackbarOptions,
   IValidationFromAPI,
-  ICustomValidator,
+  IValidator,
 } from '@/typings';
 
 // Redux Actions
-import { setUser } from '@/redux/actions/user-actions';
-import { setSuccess, setError } from '@/redux/actions/snackbar-actions';
+import { setUser } from '@/redux/actions/user';
+import { setSuccess, setError } from '@/redux/actions/snackbar';
 
 export interface ISignUpPageProps {}
 
@@ -65,11 +65,11 @@ export default function SignUp({}: ISignUpPageProps) {
       confirmPassword,
     } = signUpData;
     const checkedSignUpErrors: ISignUpValidations = {
-      firstName: CustomValidator.firstName(firstName),
-      username: CustomValidator.username(username),
-      email: CustomValidator.email(email),
-      password: CustomValidator.password(password),
-      confirmPassword: CustomValidator.confirmPassword(
+      firstName: Validator.firstName(firstName),
+      username: Validator.username(username),
+      email: Validator.email(email),
+      password: Validator.password(password),
+      confirmPassword: Validator.confirmPassword(
         password,
         confirmPassword,
       ),
@@ -97,7 +97,7 @@ export default function SignUp({}: ISignUpPageProps) {
     if (e.target.name !== `lastName`) {
       setSignUpErrors({
         ...signUpErrors,
-        [e.target.name]: (CustomValidator as ICustomValidator)[e.target.name](
+        [e.target.name]: (Validator as IValidator)[e.target.name](
           e.target.value,
         ),
       });
@@ -106,7 +106,7 @@ export default function SignUp({}: ISignUpPageProps) {
     if (e.target.name === `confirmPassword`) {
       setSignUpErrors({
         ...signUpErrors,
-        confirmPassword: CustomValidator.confirmPassword(
+        confirmPassword: Validator.confirmPassword(
           signUpData.password,
           e.target.value,
         ),
@@ -258,7 +258,7 @@ export default function SignUp({}: ISignUpPageProps) {
                   signUpErrors.password !== null &&
                   signUpErrors.password.length > 0
                     ? signUpErrors.password
-                    : `Must contain number, special character, and upper-case letter.`
+                    : `At least 6 characters.`
                 }
                 disabled={loading}
               />
@@ -301,7 +301,7 @@ export default function SignUp({}: ISignUpPageProps) {
         </CardContent>
         <CardActions>
           <Button color={`primary`} onClick={() => router.push('/signin')}>
-            Sign in instead
+            Have an account? Sign in
           </Button>
         </CardActions>
       </Card>

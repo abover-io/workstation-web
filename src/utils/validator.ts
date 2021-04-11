@@ -1,8 +1,8 @@
 import moment, { Moment } from 'moment';
 
-import { ICustomValidator } from '@/typings';
+import { IValidator } from '@/typings';
 
-export default class CustomValidator implements ICustomValidator {
+export default class Validator implements IValidator {
   public static firstName(input: string): string | null {
     if (!input) {
       return 'First Name cannot be empty!';
@@ -53,14 +53,16 @@ export default class CustomValidator implements ICustomValidator {
       return 'Password is required!';
     } else if (input.length < 6) {
       return 'Password must be at least 6 characters!';
-    } else if (
-      input.length >= 6 &&
-      !/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*)(+=._-`])([a-zA-Z0-9!@#$%^&*)(+=._-`]+)$/g.test(
-        input,
-      )
-    ) {
-      return 'Password must contain at least a Number, a Special Character, and an Upper-Case Letter!';
     }
+
+    // if (
+    //   input.length >= 6 &&
+    //   !/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*)(+=._-`])([a-zA-Z0-9!@#$%^&*)(+=._-`]+)$/g.test(
+    //     input,
+    //   )
+    // ) {
+    //   return 'Password must contain at least a Number, a Special Character, and an Upper-Case Letter!';
+    // }
 
     return null;
   }
@@ -92,7 +94,8 @@ export default class CustomValidator implements ICustomValidator {
     } else if (input !== null) {
       if (
         input.split(' ').length > 1 &&
-        (input.indexOf(' ') !== 0 && input.split(' ').includes(':'))
+        input.indexOf(' ') !== 0 &&
+        input.split(' ').includes(':')
       ) {
         let momentTime: Moment | string = moment(input, 'hh:mm A');
         momentTime = momentTime.format('hh:mm A');
