@@ -27,19 +27,19 @@ import {
 import { Layout } from '@/components';
 import {
   userAPI,
-  CustomValidator,
+  Validator,
   GOOGLE_OAUTH_CLIENT_ID,
   // FACEBOOK_OAUTH_APP_ID,
 } from '@/utils';
 
 // Redux Actions
-import { setUser } from '@/redux/actions/user-actions';
-import { setError, setSuccess } from '@/redux/actions/snackbar-actions';
+import { setUser } from '@/redux/actions/user';
+import { setError, setSuccess } from '@/redux/actions/snackbar';
 
 // Types
 import {
   ISignInValidations,
-  ICustomValidator,
+  IValidator,
   IValidationFromAPI,
 } from '@/typings';
 
@@ -63,8 +63,8 @@ export default function SignIn({}: ISignInPageProps) {
   const checkSignInErrors = (): boolean => {
     const { userIdentifier, password } = signInData;
     const checkedSignInErrors: ISignInValidations = {
-      userIdentifier: CustomValidator.userIdentifier(userIdentifier),
-      password: CustomValidator.password(password),
+      userIdentifier: Validator.userIdentifier(userIdentifier),
+      password: Validator.password(password),
     };
 
     setSignInErrors({
@@ -88,7 +88,7 @@ export default function SignIn({}: ISignInPageProps) {
   ): void => {
     setSignInErrors({
       ...signInErrors,
-      [e.target.name]: (CustomValidator as ICustomValidator)[e.target.name](
+      [e.target.name]: (Validator as IValidator)[e.target.name](
         e.target.value,
       ),
     });
@@ -246,7 +246,6 @@ export default function SignIn({}: ISignInPageProps) {
               disabled={loading}
             />
             <Button
-              classes={{ root: classes.signInButton }}
               color={`primary`}
               variant={`contained`}
               type={`submit`}
@@ -255,13 +254,8 @@ export default function SignIn({}: ISignInPageProps) {
             >
               {loading ? <CircularProgress /> : `Sign In`}
             </Button>
-          </form>
-        </CardContent>
 
-        <CardActions classes={{ root: classes.cardActions }}>
-          <section className={classes.socialSignInButtonWrapper}>
             <GoogleLogin
-              className={classes.googleSignInButton}
               clientId={GOOGLE_OAUTH_CLIENT_ID as string}
               buttonText={`Continue with Google`}
               onSuccess={googleSignInOnSuccess}
@@ -269,13 +263,16 @@ export default function SignIn({}: ISignInPageProps) {
               cookiePolicy={`single_host_origin`}
               // isSignedIn
             />
+
             {/* <FacebookLogin
               appId={FACEBOOK_OAUTH_APP_ID as string}
               autoLoad
               callback={(something) => console.log(something)}
             /> */}
-          </section>
+          </form>
+        </CardContent>
 
+        <CardActions classes={{ root: classes.cardActions }}>
           <Button color={`primary`} onClick={() => router.push('/signup')}>
             Create account
           </Button>
@@ -308,39 +305,15 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       '& > *': {
         width: '100%',
+        margin: theme.spacing(1, 0)
       },
-      '& > .MuiTextField-root': {
-        margin: theme.spacing(1, 0),
-        width: 300,
-        flexGrow: 1,
-      },
-    },
-    signInButton: {
-      marginTop: theme.spacing(3),
     },
     cardActions: {
-      marginTop: theme.spacing(2),
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'flex-start',
       padding: theme.spacing(1),
-      '& > *': {
-        margin: theme.spacing(2, 0),
-      },
-    },
-    socialSignInButtonWrapper: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      '& > *': {
-        width: '100%',
-      },
-    },
-    googleSignInButton: {
-      width: '100%',
     },
   }),
 );

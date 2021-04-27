@@ -32,10 +32,10 @@ import moment, { Moment } from 'moment';
 import clsx from 'clsx';
 
 // Types
-import { ITodo, ITodoValidations, ICustomValidator } from '@/typings';
+import { ITodo, ITodoValidations, IValidator } from '@/typings';
 
 // Utils
-import { todoAPI, CustomValidator } from '@/utils';
+import { todoAPI, Validator } from '@/utils';
 
 // Redux Actions
 import {
@@ -43,8 +43,8 @@ import {
   updateTodo,
   deleteTodo,
   completeTodo,
-} from '@/redux/actions/todo-actions';
-import { setSuccess, setError } from '@/redux/actions/snackbar-actions';
+} from '@/redux/actions/todo';
+import { setSuccess, setError } from '@/redux/actions/snackbar';
 
 // Components
 import TodoDatePicker from './todo-date-picker';
@@ -130,8 +130,8 @@ export default function TodoCard({
   const checkTodoErrors = (): boolean => {
     const { name, dueTime } = todoData;
     const checkedTodoErrors: ITodoValidations = {
-      name: CustomValidator.todoName(name),
-      dueTime: CustomValidator.dueTime(dueTime),
+      name: Validator.todoName(name),
+      dueTime: Validator.dueTime(dueTime),
     };
 
     setTodoErrors({
@@ -156,12 +156,12 @@ export default function TodoCard({
     if (e.target.name === 'name') {
       setTodoErrors({
         ...todoErrors,
-        [e.target.name]: CustomValidator.todoName(e.target.value),
+        [e.target.name]: Validator.todoName(e.target.value),
       });
     } else {
       setTodoErrors({
         ...todoErrors,
-        [e.target.name]: (CustomValidator as ICustomValidator)[e.target.name](
+        [e.target.name]: (Validator as IValidator)[e.target.name](
           e.target.value,
         ),
       });
@@ -306,7 +306,7 @@ export default function TodoCard({
   ): void => {
     setTodoErrors({
       ...todoErrors,
-      dueTime: CustomValidator.dueTime(e.target.value),
+      dueTime: Validator.dueTime(e.target.value),
     });
 
     setTodoData({

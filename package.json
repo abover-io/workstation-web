@@ -39,26 +39,45 @@
     "react-dom": "^17.0.2",
     "react-facebook-login": "^4.1.1",
     "react-google-login": "^5.2.2",
+<<<<<<< HEAD
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
     "sass": "^1.32.11",
+=======
+    "react-redux": "^7.2.3",
+    "redux": "^4.0.5",
+    "sass": "^1.32.8",
+>>>>>>> 2391ff04af80356a05d72b02b76758f6c2bf2cad
     "socket.io-client": "^4.0.1",
     "swr": "^0.5.5",
     "tipe-apa": "^0.3.3"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@babel/core": "^7.13.16",
     "@svgr/webpack": "^5.4.0",
     "@types/aos": "^3.0.3",
     "@types/moment": "^2.13.0",
     "@types/node": "^15.0.0",
     "@types/react": "^17.0.4",
+=======
+    "@babel/core": "^7.13.15",
+    "@svgr/webpack": "^5.4.0",
+    "@types/aos": "^3.0.3",
+    "@types/moment": "^2.13.0",
+    "@types/node": "^14.14.37",
+    "@types/react": "^17.0.3",
+>>>>>>> 2391ff04af80356a05d72b02b76758f6c2bf2cad
     "@types/react-facebook-login": "^4.1.3",
     "@types/react-redux": "^7.1.16",
     "@types/redux": "^3.6.0",
     "babel-loader": "^8.1.0",
     "npm-run-all": "^4.1.5",
+<<<<<<< HEAD
     "ts-loader": "^9.1.1",
+=======
+    "ts-loader": "^8.1.0",
+>>>>>>> 2391ff04af80356a05d72b02b76758f6c2bf2cad
     "typescript": "~4.2.4"
   }
 }

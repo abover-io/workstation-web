@@ -29,8 +29,8 @@ import {
 import clsx from 'clsx';
 
 // Redux Actions
-import { setSelectedTodoCategory } from '@/redux/actions/current-actions';
-import { resetSnackbar } from '@/redux/actions/snackbar-actions';
+import { setSelectedTodoCategory } from '@/redux/actions/current';
+import { resetSnackbar } from '@/redux/actions/snackbar';
 
 // Utils
 import { capitalize } from '@/utils';

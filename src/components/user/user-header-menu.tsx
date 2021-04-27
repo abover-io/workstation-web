@@ -12,7 +12,7 @@ import {
 
 import { IUser, IRootState } from '@/typings';
 import { userAPI } from '@/utils';
-import { setError, setSuccess } from '@/redux/actions/snackbar-actions';
+import { setError, setSuccess } from '@/redux/actions/snackbar';
 
 export interface IUserHeaderMenuProps {}
 

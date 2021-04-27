@@ -10,7 +10,7 @@ import { Alert } from '@material-ui/lab';
 import { IRootState, ISnackbarOptions } from '@/typings';
 
 // Redux Actions
-import { resetSnackbar } from '@/redux/actions/snackbar-actions';
+import { resetSnackbar } from '@/redux/actions/snackbar';
 
 // Components
 import CustomHead from './custom-head';

@@ -12,9 +12,9 @@ import { Loading, AppLayout, TodoList } from '@/components';
 import { userAPI } from '@/utils';
 
 // Redux Actions
-import { setUser } from '@/redux/actions/user-actions';
-import { setTodos as setTodosRedux } from '@/redux/actions/todo-actions';
-import { setWarning, setError } from '@/redux/actions/snackbar-actions';
+import { setUser } from '@/redux/actions/user';
+import { setTodos as setTodosRedux } from '@/redux/actions/todo';
+import { setWarning, setError } from '@/redux/actions/snackbar';
 
 // Typings
 import { IRootState, ITodo } from '@/typings';

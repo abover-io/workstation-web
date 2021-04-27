@@ -1,4 +1,4 @@
-export { default as userReducer } from './user-reducer';
-export { default as todoReducer } from './todo-reducer';
-export { default as currentReducer } from './current-reducer';
-export { default as snackbarReducer } from './snackbar-reducer';
+export { default as userReducer } from './user';
+export { default as todoReducer } from './todo';
+export { default as currentReducer } from './current';
+export { default as snackbarReducer } from './snackbar';

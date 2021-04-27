@@ -140,6 +140,6 @@ export interface IValidationFromAPI {
  *
  */
 
-export interface ICustomValidator {
+export interface IValidator {
   [method: string]: any;
 }
