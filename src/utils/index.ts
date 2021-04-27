@@ -9,10 +9,7 @@ export { default as todoAPI } from './todo-api';
 export { default as capitalize } from './capitalize';
 
 // Environment Variables
-export const GOOGLE_OAUTH_CLIENT_ID: string | any =
-  process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID;
-export const GOOGLE_OAUTH_CLIENT_SECRET: string | any =
-  process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_SECRET;
-
-export const FACEBOOK_OAUTH_APP_ID: string | any =
-  process.env.NEXT_PUBLIC_FACEBOOK_OAUTH_APP_ID;
+export const GOOGLE_OAUTH_CLIENT_ID: string = process.env
+  .NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID! as string;
+export const GOOGLE_OAUTH_CLIENT_SECRET: string = process.env
+  .NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_SECRET! as string;

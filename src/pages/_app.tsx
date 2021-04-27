@@ -7,7 +7,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
-import AOS from 'aos';
 import { useCookies } from 'react-cookie';
 
 import { Loading } from '@/components';
@@ -41,7 +40,6 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   useEffect(() => {
-    AOS.init();
     checkAuthWithUseCallback();
   }, []);
 

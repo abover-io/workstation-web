@@ -1,6 +1,5 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { Snackbar } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 
@@ -14,7 +13,6 @@ import { resetSnackbar } from '@/redux/actions/snackbar';
 
 // Components
 import CustomHead from './custom-head';
-import Container from './container';
 
 export interface IAppLayoutProps {
   title: string;
@@ -29,7 +27,6 @@ export default function AppLayout({
 }: // header = true,
 // footer = true,
 IAppLayoutProps) {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const snackbar = useSelector((state: IRootState) => state.snackbar);
   const [snackbarOptions, setSnackbarOptions] = useState<ISnackbarOptions>({
@@ -98,11 +95,15 @@ IAppLayoutProps) {
 
       {/* <Header /> */}
 
-      <Container>{children}</Container>
+      {children}
 
       {/* <Footer /> */}
 
-      <Snackbar open={snackbarOptions.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+      <Snackbar
+        open={snackbarOptions.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
         <Alert
           severity={snackbarOptions.severity}
           onClose={handleCloseAlert}
@@ -115,5 +116,3 @@ IAppLayoutProps) {
     </>
   );
 }
-
-const useStyles = makeStyles(() => createStyles({}));

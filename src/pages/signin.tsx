@@ -3,15 +3,15 @@ import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import {
+  Grid,
   TextField,
-  Card,
-  CardContent,
-  CardActions,
   Typography,
   Button,
   InputAdornment,
   IconButton,
   CircularProgress,
+  Divider,
+  Paper,
 } from '@material-ui/core';
 import {
   VisibilityOff as VisibilityOffIcon,
@@ -22,31 +22,20 @@ import {
   GoogleLoginResponse,
   GoogleLoginResponseOffline,
 } from 'react-google-login';
-// import FacebookLogin from 'react-facebook-login';
+import clsx from 'clsx';
 
 import { Layout } from '@/components';
-import {
-  userAPI,
-  Validator,
-  GOOGLE_OAUTH_CLIENT_ID,
-  // FACEBOOK_OAUTH_APP_ID,
-} from '@/utils';
+import { userAPI, Validator, GOOGLE_OAUTH_CLIENT_ID } from '@/utils';
 
 // Redux Actions
 import { setUser } from '@/redux/actions/user';
 import { setError, setSuccess } from '@/redux/actions/snackbar';
 
 // Types
-import {
-  ISignInValidations,
-  IValidator,
-  IValidationFromAPI,
-} from '@/typings';
+import { ISignInValidations, IValidator, IValidationFromAPI } from '@/typings';
 
-export interface ISignInPageProps {}
-
-export default function SignIn({}: ISignInPageProps) {
-  const classes = useStyles({});
+export default function SignIn() {
+  const classes = useStyles();
   const router = useRouter();
   const dispatch = useDispatch();
   const [signInData, setSignInData] = useState({
@@ -88,9 +77,7 @@ export default function SignIn({}: ISignInPageProps) {
   ): void => {
     setSignInErrors({
       ...signInErrors,
-      [e.target.name]: (Validator as IValidator)[e.target.name](
-        e.target.value,
-      ),
+      [e.target.name]: (Validator as IValidator)[e.target.name](e.target.value),
     });
 
     setSignInData({ ...signInData, [e.target.name]: e.target.value });
@@ -187,19 +174,45 @@ export default function SignIn({}: ISignInPageProps) {
 
   return (
     <Layout title={`Sign In`}>
-      <Card classes={{ root: classes.cardContainer }}>
-        <CardContent classes={{ root: classes.cardContent }}>
-          <Typography variant={`h4`} gutterBottom>
-            Welcome back!
+      <Grid
+        className={classes.wrapper}
+        container
+        direction={`column`}
+        justify={`center`}
+      >
+        <Grid item>
+          <Typography className={classes.headerText} variant={`h5`}>
+            Sign in
           </Typography>
+        </Grid>
 
-          <form
-            className={classes.signInForm}
-            onSubmit={handleSignIn}
-            noValidate={false}
-            autoComplete={`on`}
-          >
+        <Grid item>
+          <GoogleLogin
+            className={classes.googleButton}
+            clientId={GOOGLE_OAUTH_CLIENT_ID}
+            buttonText={`Continue with Google`}
+            onSuccess={googleSignInOnSuccess}
+            onFailure={googleSignInOnFailure}
+            cookiePolicy={`single_host_origin`}
+            isSignedIn
+          />
+        </Grid>
+
+        <Divider />
+
+        <Grid
+          item
+          container
+          className={classes.form}
+          component={`form`}
+          direction={`column`}
+          onSubmit={handleSignIn}
+          noValidate={false}
+          autoComplete={`on`}
+        >
+          <Grid item>
             <TextField
+              fullWidth
               autoComplete={`username`}
               label={`Username or Email`}
               name={`userIdentifier`}
@@ -212,8 +225,14 @@ export default function SignIn({}: ISignInPageProps) {
               }
               helperText={signInErrors.userIdentifier}
               disabled={loading}
+              variant={`outlined`}
+              size={`small`}
             />
+          </Grid>
+
+          <Grid item>
             <TextField
+              fullWidth
               autoComplete={`current-password`}
               label={`Password`}
               name={`password`}
@@ -244,76 +263,91 @@ export default function SignIn({}: ISignInPageProps) {
                 ),
               }}
               disabled={loading}
+              variant={`outlined`}
+              size={`small`}
             />
+          </Grid>
+
+          <Grid item container direction={`column`}>
+            <Grid item>
+              <Button
+                className={clsx(classes.button, classes.signInButton)}
+                fullWidth
+                color={`primary`}
+                variant={`contained`}
+                type={`submit`}
+                onClick={handleSignIn}
+                disabled={loading}
+                size={`medium`}
+              >
+                {loading ? <CircularProgress /> : `Sign in`}
+              </Button>
+            </Grid>
+
+            <Grid item>
+              <Button
+                className={clsx(classes.button, classes.forgotButton)}
+                variant={`text`}
+                type={`button`}
+                disabled={loading}
+                size={`small`}
+              >
+                {`Forgot password?`}
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Divider />
+
+          <Grid item container justify={`center`}>
             <Button
+              className={clsx(classes.button, classes.signUpButton)}
               color={`primary`}
-              variant={`contained`}
-              type={`submit`}
-              onClick={handleSignIn}
-              disabled={loading}
+              onClick={() => router.push('/signup')}
+              variant={`text`}
+              size={`small`}
             >
-              {loading ? <CircularProgress /> : `Sign In`}
+              Create account
             </Button>
-
-            <GoogleLogin
-              clientId={GOOGLE_OAUTH_CLIENT_ID as string}
-              buttonText={`Continue with Google`}
-              onSuccess={googleSignInOnSuccess}
-              onFailure={googleSignInOnFailure}
-              cookiePolicy={`single_host_origin`}
-              // isSignedIn
-            />
-
-            {/* <FacebookLogin
-              appId={FACEBOOK_OAUTH_APP_ID as string}
-              autoLoad
-              callback={(something) => console.log(something)}
-            /> */}
-          </form>
-        </CardContent>
-
-        <CardActions classes={{ root: classes.cardActions }}>
-          <Button color={`primary`} onClick={() => router.push('/signup')}>
-            Create account
-          </Button>
-        </CardActions>
-      </Card>
+          </Grid>
+        </Grid>
+      </Grid>
     </Layout>
   );
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    cardContainer: {
-      padding: theme.spacing(2),
-    },
-    cardContent: {
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: theme.spacing(1),
-      '& > *': {
-        width: '100%',
-      },
-    },
-    signInForm: {
+    wrapper: {
       width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      height: '100%',
+      padding: theme.spacing(1),
       '& > *': {
-        width: '100%',
-        margin: theme.spacing(1, 0)
+        margin: theme.spacing(2, 0),
       },
     },
-    cardActions: {
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'flex-start',
-      padding: theme.spacing(1),
+    headerText: {
+      fontWeight: theme.typography.fontWeightBold,
     },
+    form: {
+      '& > *': {
+        margin: theme.spacing(1, 0),
+      },
+    },
+    button: {
+      textTransform: 'none',
+    },
+    signInButton: {
+      fontWeight: theme.typography.fontWeightBold,
+    },
+    signUpButton: {
+      color: theme.palette.text.primary,
+    },
+    forgotButton: {
+      marginTop: theme.spacing(2),
+      color: theme.palette.text.secondary,
+    },
+    googleButton: {},
+    content: {},
   }),
 );
