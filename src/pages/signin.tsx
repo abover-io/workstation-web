@@ -22,6 +22,7 @@ import {
   GoogleLoginResponse,
   GoogleLoginResponseOffline,
 } from 'react-google-login';
+import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 
 import { Layout } from '@/components';
@@ -195,6 +196,14 @@ export default function SignIn() {
             onFailure={googleSignInOnFailure}
             cookiePolicy={`single_host_origin`}
             isSignedIn
+            render={(renderProps) => (
+              <GoogleLoginButton
+                onClick={renderProps.onClick}
+                preventActiveStyles
+              >
+                <Typography variant={`body2`}>Continue with Google</Typography>
+              </GoogleLoginButton>
+            )}
           />
         </Grid>
 
