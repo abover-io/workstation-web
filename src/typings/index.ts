@@ -35,12 +35,9 @@ export interface ISignInData {
 }
 
 export interface ISignUpData {
-  firstName: string;
-  lastName: string;
-  username: string;
+  name: string;
   email: string;
   password: string;
-  confirmPassword: string;
 }
 
 /**
@@ -56,12 +53,10 @@ export interface ISignInValidations {
 }
 
 export interface ISignUpValidations {
-  firstName: string | null;
-  email: string | null;
-  username: string | null;
-  password: string | null;
-  confirmPassword: string | null;
   [key: string]: string | null;
+  name: string | null;
+  email: string | null;
+  password: string | null;
 }
 
 export interface ITodoValidations {

@@ -47,7 +47,7 @@ export default function SignIn() {
     userIdentifier: null,
     password: null,
   });
-  const [showInputPassword, setShowInputPassword] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const checkSignInErrors = (): boolean => {
@@ -246,7 +246,7 @@ export default function SignIn() {
               label={`Password`}
               name={`password`}
               required
-              type={showInputPassword ? `text` : `password`}
+              type={showPassword ? `text` : `password`}
               value={signInData.password}
               onChange={handleOnChange}
               error={
@@ -258,11 +258,11 @@ export default function SignIn() {
                 endAdornment: (
                   <InputAdornment position={`end`}>
                     <IconButton
-                      onClick={() => setShowInputPassword(!showInputPassword)}
+                      onClick={() => setShowPassword(!showPassword)}
                       onMouseDown={(e) => e.preventDefault()}
                       disabled={loading}
                     >
-                      {showInputPassword ? (
+                      {showPassword ? (
                         <VisibilityIcon />
                       ) : (
                         <VisibilityOffIcon />
@@ -285,11 +285,10 @@ export default function SignIn() {
                 color={`primary`}
                 variant={`contained`}
                 type={`submit`}
-                onClick={handleSignIn}
                 disabled={loading}
                 size={`medium`}
               >
-                {loading ? <CircularProgress /> : `Sign in`}
+                {loading ? <CircularProgress size={28} /> : `Sign in`}
               </Button>
             </Grid>
 
@@ -311,7 +310,6 @@ export default function SignIn() {
           <Grid item container justify={`center`}>
             <Button
               className={clsx(classes.button, classes.signUpButton)}
-              color={`primary`}
               onClick={() => router.push('/signup')}
               variant={`text`}
               size={`small`}

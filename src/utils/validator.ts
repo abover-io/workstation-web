@@ -3,9 +3,9 @@ import moment, { Moment } from 'moment';
 import { IValidator } from '@/typings';
 
 export default class Validator implements IValidator {
-  public static firstName(input: string): string | null {
+  public static Name(input: string): string | null {
     if (!input) {
-      return 'First Name cannot be empty!';
+      return 'Name cannot be empty!';
     }
 
     return null;
@@ -63,17 +63,6 @@ export default class Validator implements IValidator {
     // ) {
     //   return 'Password must contain at least a Number, a Special Character, and an Upper-Case Letter!';
     // }
-
-    return null;
-  }
-
-  public static confirmPassword(
-    password: string,
-    confirmTarget: string,
-  ): string | null {
-    if (password !== confirmTarget || !password || !confirmTarget) {
-      return 'Password does not match!';
-    }
 
     return null;
   }

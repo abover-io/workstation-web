@@ -3,76 +3,69 @@ import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
+  Grid,
   TextField,
-  Card,
-  CardContent,
-  CardActions,
+  Divider,
   Typography,
   Button,
-  Theme,
   IconButton,
   CircularProgress,
+  InputAdornment,
 } from '@material-ui/core';
 import {
   VisibilityOff as VisibilityOffIcon,
   Visibility as VisibilityIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@material-ui/icons';
-
-import { Layout } from '@/components';
-import { userAPI, Validator } from '@/utils';
 import {
-  ISignUpData,
-  ISignUpValidations,
-  ISnackbarOptions,
-  IValidationFromAPI,
-  IValidator,
-} from '@/typings';
+  GoogleLogin,
+  GoogleLoginResponse,
+  GoogleLoginResponseOffline,
+} from 'react-google-login';
+import { GoogleLoginButton } from 'react-social-login-buttons';
+import clsx from 'clsx';
+import update from 'immutability-helper';
+
+// Typings
+import { ISignUpData, ISignUpValidations, IValidationFromAPI } from '@/typings';
+
+// Components
+import { Layout } from '@/components';
+
+// Utils
+import { userAPI, Validator, GOOGLE_OAUTH_CLIENT_ID } from '@/utils';
 
 // Redux Actions
 import { setUser } from '@/redux/actions/user';
 import { setSuccess, setError } from '@/redux/actions/snackbar';
 
-export interface ISignUpPageProps {}
+type SignUpStep = 'email' | 'name-password';
 
-export default function SignUp({}: ISignUpPageProps) {
-  const classes = useStyles({});
+export default function SignUp() {
+  const classes = useStyles();
   const router = useRouter();
   const dispatch = useDispatch();
+  const [currentStep, setCurrentStep] = useState<SignUpStep>('email');
   const [signUpData, setSignUpData] = useState<ISignUpData>({
-    firstName: '',
-    lastName: '',
-    username: '',
+    name: '',
     email: '',
     password: '',
-    confirmPassword: '',
   });
   const [signUpErrors, setSignUpErrors] = useState<ISignUpValidations>({
-    firstName: null,
+    name: null,
     username: null,
     email: null,
     password: null,
-    confirmPassword: null,
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const checkSignUpErrors = () => {
-    const {
-      firstName,
-      username,
-      email,
-      password,
-      confirmPassword,
-    } = signUpData;
+    const { name, email, password } = signUpData;
     const checkedSignUpErrors: ISignUpValidations = {
-      firstName: Validator.firstName(firstName),
-      username: Validator.username(username),
+      name: Validator.Name(name),
       email: Validator.email(email),
       password: Validator.password(password),
-      confirmPassword: Validator.confirmPassword(
-        password,
-        confirmPassword,
-      ),
     };
 
     setSignUpErrors({
@@ -94,42 +87,19 @@ export default function SignUp({}: ISignUpPageProps) {
   const handleOnChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    if (e.target.name !== `lastName`) {
-      setSignUpErrors({
-        ...signUpErrors,
-        [e.target.name]: (Validator as IValidator)[e.target.name](
-          e.target.value,
-        ),
-      });
-    }
-
-    if (e.target.name === `confirmPassword`) {
-      setSignUpErrors({
-        ...signUpErrors,
-        confirmPassword: Validator.confirmPassword(
-          signUpData.password,
-          e.target.value,
-        ),
-      });
-    }
-
     setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
   };
 
   const handleSignUp = async (
-    e:
-      | FormEvent<HTMLFormElement | HTMLInputElement | HTMLTextAreaElement>
-      | MouseEvent<HTMLButtonElement>,
+    e: FormEvent<HTMLFormElement | HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setLoading(true);
     e.preventDefault();
-    const { firstName, lastName, username, email, password } = signUpData;
+    const { name, email, password } = signUpData;
     try {
       if (checkSignUpErrors()) {
         const { data } = await userAPI.post('/signup', {
-          firstName,
-          lastName,
-          username,
+          name,
           email,
           password,
         });
@@ -171,63 +141,113 @@ export default function SignUp({}: ISignUpPageProps) {
     }
   };
 
-  return (
-    <Layout title={`Sign Up`}>
-      <Card classes={{ root: classes.cardContainer }}>
-        <Typography variant={`h4`} gutterBottom>
-          Let's get started!
-        </Typography>
-        <CardContent classes={{ root: classes.cardFormSection }}>
-          <form
-            className={classes.signUpForm}
-            onSubmit={handleSignUp}
+  const googleSignInOnSuccess = async (
+    response: GoogleLoginResponse | GoogleLoginResponseOffline,
+  ): Promise<void> => {
+    setLoading(true);
+
+    try {
+      const { data } = await userAPI.post('/auth/google', {
+        googleIdToken: (response as GoogleLoginResponse).tokenId,
+      });
+
+      dispatch(setUser(data.user));
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      dispatch(setSuccess(data.message));
+
+      setLoading(false);
+
+      await router.push('/app');
+    } catch (err) {
+      setLoading(false);
+
+      if (err.response) {
+        if (err.response.data) {
+          dispatch(setError(err.response.data.message));
+        }
+      }
+    }
+  };
+
+  const googleSignInOnFailure = (err: any): void => {
+    dispatch(setError(err.response.data.message));
+  };
+
+  const handleValidateCurrentStep = (
+    e: FormEvent<HTMLFormElement | HTMLInputElement | HTMLTextAreaElement>,
+    step: SignUpStep,
+  ) => {
+    e.preventDefault();
+
+    if (step === 'email') {
+      const emailValidation = Validator.email(signUpData.email);
+      setSignUpErrors(
+        update(signUpErrors, {
+          email: {
+            $set: emailValidation,
+          },
+        }),
+      );
+
+      if (emailValidation === null) {
+        setCurrentStep('name-password');
+      }
+    }
+  };
+
+  const handleRenderSteps = (step: SignUpStep) => {
+    if (step === 'email') {
+      return (
+        <>
+          <Grid item>
+            <Typography className={classes.headerText} variant={`h5`}>
+              Sign up
+            </Typography>
+          </Grid>
+
+          <Grid item>
+            <GoogleLogin
+              className={classes.googleButton}
+              clientId={GOOGLE_OAUTH_CLIENT_ID}
+              buttonText={`Continue with Google`}
+              onSuccess={googleSignInOnSuccess}
+              onFailure={googleSignInOnFailure}
+              cookiePolicy={`single_host_origin`}
+              isSignedIn
+              render={(renderProps) => (
+                <GoogleLoginButton
+                  onClick={renderProps.onClick}
+                  preventActiveStyles
+                >
+                  <Typography variant={`body2`}>
+                    Continue with Google
+                  </Typography>
+                </GoogleLoginButton>
+              )}
+            />
+          </Grid>
+
+          <Divider />
+
+          <Grid
+            item
+            container
+            className={classes.form}
+            component={`form`}
+            direction={`column`}
+            onSubmit={(
+              e: FormEvent<
+                HTMLFormElement | HTMLInputElement | HTMLTextAreaElement
+              >,
+            ) => handleValidateCurrentStep(e, 'email')}
             noValidate={false}
             autoComplete={`on`}
           >
-            <div className={classes.textFieldGroupHorizontal}>
-              <TextField
-                name={`firstName`}
-                required
-                label={`First Name`}
-                value={signUpData.firstName}
-                onChange={handleOnChange}
-                error={
-                  signUpErrors.firstName !== null &&
-                  signUpErrors.firstName.length > 0
-                }
-                helperText={signUpErrors.firstName}
-                disabled={loading}
-              />
-              <TextField
-                name={`lastName`}
-                label={`Last Name`}
-                value={signUpData.lastName}
-                onChange={handleOnChange}
-                disabled={loading}
-              />
-            </div>
-            <div className={classes.textFieldGroupVertical}>
-              <TextField
-                autoComplete={`username`}
-                name={`username`}
-                required
-                label={`Username`}
-                value={signUpData.username}
-                onChange={handleOnChange}
-                error={
-                  signUpErrors.username !== null &&
-                  signUpErrors.username.length > 0
-                }
-                helperText={
-                  signUpErrors.username !== null &&
-                  signUpErrors.username.length > 0
-                    ? signUpErrors.username
-                    : `Must be at least 6 characters.`
-                }
-                disabled={loading}
-              />
+            <Grid item>
               <TextField
                 autoComplete={`email`}
+                fullWidth
                 name={`email`}
                 required
                 type={`email`}
@@ -239,11 +259,81 @@ export default function SignUp({}: ISignUpPageProps) {
                 }
                 helperText={signUpErrors.email}
                 disabled={loading}
+                size={`small`}
+                variant={`outlined`}
               />
-            </div>
-            <div className={classes.textFieldGroupHorizontal}>
+            </Grid>
+
+            <Grid item>
+              <Button
+                className={clsx(classes.button, classes.signUpButton)}
+                fullWidth
+                variant={`contained`}
+                color={`primary`}
+                type={`submit`}
+                disabled={loading}
+                size={`medium`}
+              >
+                {`Sign up with email`}
+              </Button>
+            </Grid>
+          </Grid>
+        </>
+      );
+    }
+
+    if (step === 'name-password') {
+      return (
+        <>
+          <Grid item>
+            <Button
+              className={clsx(classes.button, classes.backButton)}
+              onClick={() => setCurrentStep('email')}
+              startIcon={<ArrowBackIcon />}
+              size={`small`}
+            >
+              {signUpData.email}
+            </Button>
+          </Grid>
+
+          <Grid item>
+            <Typography className={classes.headerText} variant={`h5`}>
+              Almost there
+            </Typography>
+          </Grid>
+
+          <Grid
+            item
+            container
+            className={classes.form}
+            component={`form`}
+            direction={`column`}
+            onSubmit={handleSignUp}
+            noValidate={false}
+            autoComplete={`on`}
+          >
+            <Grid item>
+              <TextField
+                name={`name`}
+                fullWidth
+                required
+                label={`Your name`}
+                value={signUpData.name}
+                onChange={handleOnChange}
+                error={
+                  signUpErrors.name !== null && signUpErrors.name.length > 0
+                }
+                helperText={signUpErrors.name}
+                disabled={loading}
+                size={`small`}
+                variant={`outlined`}
+              />
+            </Grid>
+
+            <Grid item>
               <TextField
                 autoComplete={`new-password`}
+                fullWidth
                 name={`password`}
                 required
                 type={showPassword ? `text` : `password`}
@@ -261,120 +351,107 @@ export default function SignUp({}: ISignUpPageProps) {
                     : `At least 6 characters.`
                 }
                 disabled={loading}
+                size={`small`}
+                variant={`outlined`}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position={`end`}>
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        disabled={loading}
+                      >
+                        {showPassword ? (
+                          <VisibilityIcon />
+                        ) : (
+                          <VisibilityOffIcon />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
-              <TextField
-                autoComplete={`new-password`}
-                name={`confirmPassword`}
-                required
-                type={showPassword ? `text` : `password`}
-                label={`Confirm Password`}
-                value={signUpData.confirmPassword}
-                onChange={handleOnChange}
-                error={
-                  signUpErrors.confirmPassword !== null &&
-                  signUpErrors.confirmPassword.length > 0
-                }
-                helperText={signUpErrors.confirmPassword}
-                disabled={loading}
-              />
+            </Grid>
 
-              <IconButton
-                onClick={() => setShowPassword(!showPassword)}
-                onMouseDown={(e) => e.preventDefault()}
+            <Grid item>
+              <Button
+                className={clsx(classes.button, classes.signUpButton)}
+                fullWidth
+                variant={`contained`}
+                color={`primary`}
+                type={`submit`}
                 disabled={loading}
+                size={`medium`}
               >
-                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-              </IconButton>
-            </div>
+                {loading ? <CircularProgress size={28} /> : `Sign up now`}
+              </Button>
+            </Grid>
+          </Grid>
+        </>
+      );
+    }
+  };
 
-            <Button
-              classes={{ root: classes.signUpButton }}
-              variant={`contained`}
-              color={`primary`}
-              type={`submit`}
-              onClick={handleSignUp}
-              disabled={loading}
-            >
-              {loading ? <CircularProgress /> : `Sign Up`}
-            </Button>
-          </form>
-        </CardContent>
-        <CardActions>
-          <Button color={`primary`} onClick={() => router.push('/signin')}>
-            Have an account? Sign in
+  return (
+    <Layout title={`Sign Up`}>
+      <Grid
+        className={classes.wrapper}
+        container
+        direction={`column`}
+        justify={`center`}
+      >
+        {handleRenderSteps(currentStep)}
+
+        <Divider />
+
+        <Grid item container justify={`center`}>
+          <Button
+            className={clsx(classes.button, classes.signInButton)}
+            variant={`text`}
+            fullWidth
+            onClick={() => router.push('/signin')}
+            size={`small`}
+          >
+            Sign in
           </Button>
-        </CardActions>
-      </Card>
+        </Grid>
+      </Grid>
     </Layout>
   );
 }
 
-const useStyles = makeStyles<Theme, ISignUpPageProps>((theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
-    cardContainer: {
-      padding: theme.spacing(4),
-    },
-    cardFormSection: {
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
+    wrapper: {
+      width: '100%',
       height: '100%',
-      width: '100%',
-    },
-    signUpForm: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      padding: theme.spacing(1),
       '& > *': {
-        width: '100%',
+        margin: theme.spacing(2, 0),
       },
     },
-    formTitle: {
-      textAlign: 'left',
-      lineHeight: 1,
-      margin: 0,
-      width: '100%',
+    headerText: {
+      fontWeight: theme.typography.fontWeightBold,
+    },
+    form: {
+      '& > *': {
+        margin: theme.spacing(1, 0),
+      },
+    },
+    button: {
+      textTransform: 'none',
     },
     signUpButton: {
-      marginTop: theme.spacing(4),
+      fontWeight: theme.typography.fontWeightBold,
     },
-    textFieldGroupHorizontal: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-      alignItems: 'stretch',
-      '& > .MuiTextField-root': {
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1),
-        flexGrow: 1,
-        width: 250,
-      },
-      '& > .MuiTextField-root:first-child': {
-        [theme.breakpoints.down('xs')]: {
-          paddingRight: 0,
-        },
-        paddingRight: theme.spacing(3),
-      },
-      '& > .MuiIconButton-root': {
-        alignSelf: 'center',
-      },
+    signInButton: {
+      color: theme.palette.text.primary,
     },
-    textFieldGroupVertical: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      flexWrap: 'wrap',
-      '& > .MuiTextField-root': {
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1),
-        flexGrow: 1,
-      },
+    googleButton: {},
+    content: {},
+    backButton: {
+      paddingLeft: 0,
+      color: theme.palette.text.primary,
     },
   }),
 );
