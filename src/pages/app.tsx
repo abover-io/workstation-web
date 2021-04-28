@@ -12,12 +12,12 @@ import { Loading, AppLayout, TodoList } from '@/components';
 import { userAPI } from '@/utils';
 
 // Redux Actions
-import { setUser } from '@/redux/actions/user';
-import { setTodos as setTodosRedux } from '@/redux/actions/todo';
+import { setUser } from '@/redux/actions/auth';
+import { setTodos as setTodosRedux } from '@/redux/actions/list';
 import { setWarning, setError } from '@/redux/actions/snackbar';
 
 // Typings
-import { IRootState, ITodo } from '@/typings';
+import { IRootState, ITodo } from '@/types';
 
 export interface IAppProps {}
 

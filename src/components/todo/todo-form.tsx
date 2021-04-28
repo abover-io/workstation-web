@@ -2,8 +2,7 @@ import React from 'react';
 // import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Card, CardContent, Typography } from '@material-ui/core';
 
-
-import { ITodo } from '@/typings';
+import { ITodo } from '@/types';
 
 export interface ITodoFormProps {
   type: 'update' | 'add';
@@ -30,15 +29,13 @@ export default function TodoForm({ type, todo }: ITodoFormProps) {
   //   position: todo?.position || null,
   //   completed: todo?.completed || false
   // });
-  
+
   const renderAddTodoForm = () => (
     <Card>
       <div>
         <Typography variant={`h4`}>Add Todo</Typography>
       </div>
-      <CardContent>
-
-      </CardContent>
+      <CardContent></CardContent>
     </Card>
   );
 
@@ -47,13 +44,13 @@ export default function TodoForm({ type, todo }: ITodoFormProps) {
       <div>
         <Typography variant={`h4`}>Add Todo</Typography>
       </div>
-      <CardContent>
-
-      </CardContent>
+      <CardContent></CardContent>
     </Card>
   );
 
-  return type === 'update' && todo ? renderUpdateTodoForm() : renderAddTodoForm();
+  return type === 'update' && todo
+    ? renderUpdateTodoForm()
+    : renderAddTodoForm();
 }
 
 // const useStyles = makeStyles(() => createStyles({}));

@@ -8,7 +8,7 @@ import TodoCard from './todo-card';
 import BlankTodoCard from './blank-todo-card';
 
 // Typings
-import { ITodo } from '@/typings';
+import { ITodo } from '@/types';
 
 // Utils
 import { capitalize } from '@/utils';

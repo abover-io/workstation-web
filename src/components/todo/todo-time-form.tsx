@@ -11,7 +11,7 @@ import { AccessTime as AccessTimeIcon } from '@material-ui/icons';
 import { Moment } from 'moment';
 
 // Types
-import { ITodo, ITodoValidations } from '@/typings';
+import { ITodo, ITodoValidations } from '@/types';
 
 export interface ITodoTimeFormProps {
   todo: ITodo;

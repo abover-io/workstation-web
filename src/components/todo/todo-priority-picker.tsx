@@ -13,7 +13,7 @@ import { red, orange, blue } from '@material-ui/core/colors';
 import clsx from 'clsx';
 
 // Typings
-import { ITodo } from '@/typings';
+import { ITodo } from '@/types';
 
 export interface ITodoPriorityPicker {
   todo: ITodo;

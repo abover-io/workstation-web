@@ -1,17 +1,17 @@
-import { combineReducers, createStore } from 'redux';
+import { Reducer, CombinedState, combineReducers, createStore } from 'redux';
 
-import {
-  userReducer,
-  todoReducer,
-  currentReducer,
-  snackbarReducer,
-} from './reducers';
+// Types
+import { IRootState, IAction } from '@/types/redux';
 
-const reducers = combineReducers({
-  user: userReducer,
-  todo: todoReducer,
-  current: currentReducer,
-  snackbar: snackbarReducer,
+// Reducers
+import { authReducer, listReducer } from './reducers';
+
+const reducers: Reducer<CombinedState<IRootState>, IAction> = combineReducers<
+  IRootState,
+  IAction
+>({
+  auth: authReducer,
+  list: listReducer,
 });
 
 const store = createStore(reducers, enableReduxDevTools());

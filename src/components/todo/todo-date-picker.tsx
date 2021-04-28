@@ -9,7 +9,7 @@ import moment, { Moment } from 'moment';
 import clsx from 'clsx';
 
 // Types
-import { ITodo } from '@/typings';
+import { ITodo } from '@/types';
 
 export interface ITodoDatePickerProps {
   todo: ITodo;

@@ -36,7 +36,7 @@ import { resetSnackbar } from '@/redux/actions/snackbar';
 import { capitalize } from '@/utils';
 
 // Types
-import { IRootState, ISnackbarOptions } from '@/typings';
+import { IRootState, ISnackbarOptions } from '@/types';
 
 // Components
 import { CustomHead, UserHeaderMenu } from '@/components';

@@ -27,7 +27,7 @@ import clsx from 'clsx';
 import update from 'immutability-helper';
 
 // Typings
-import { ISignUpData, ISignUpValidations, IValidationFromAPI } from '@/typings';
+import { ISignUpData, ISignUpValidations, IValidationFromAPI } from '@/types';
 
 // Components
 import { Layout } from '@/components';
@@ -36,7 +36,7 @@ import { Layout } from '@/components';
 import { userAPI, Validator, GOOGLE_OAUTH_CLIENT_ID } from '@/utils';
 
 // Redux Actions
-import { setUser } from '@/redux/actions/user';
+import { setUser } from '@/redux/actions/auth';
 import { setSuccess, setError } from '@/redux/actions/snackbar';
 
 type SignUpStep = 'email' | 'name-password';

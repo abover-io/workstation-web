@@ -26,14 +26,18 @@ import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 
 import { Layout } from '@/components';
-import { userAPI, Validator, GOOGLE_OAUTH_CLIENT_ID } from '@/utils';
+
+// APIs
+import { AuthAPI } from '@/apis';
+
+import { Validator, GOOGLE_OAUTH_CLIENT_ID } from '@/utils';
 
 // Redux Actions
-import { setUser } from '@/redux/actions/user';
+import { setUser } from '@/redux/actions/auth';
 import { setError, setSuccess } from '@/redux/actions/snackbar';
 
 // Types
-import { ISignInValidations, IValidator, IValidationFromAPI } from '@/typings';
+import { ISignInValidations, IValidator, IValidationFromAPI } from '@/types';
 
 export default function SignIn() {
   const classes = useStyles();
@@ -95,7 +99,7 @@ export default function SignIn() {
 
     try {
       if (checkSignInErrors()) {
-        const { data } = await userAPI.post('/signin', {
+        const { data } = await AuthAPI.post('/signin', {
           userIdentifier,
           password,
         });
@@ -146,7 +150,7 @@ export default function SignIn() {
     setLoading(true);
 
     try {
-      const { data } = await userAPI.post('/auth/google', {
+      const { data } = await AuthAPI.post('/auth/google', {
         googleIdToken: (response as GoogleLoginResponse).tokenId,
       });
 

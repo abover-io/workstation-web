@@ -10,7 +10,7 @@ import {
   MenuItem,
 } from '@material-ui/core';
 
-import { IUser, IRootState } from '@/typings';
+import { IUser, IRootState } from '@/types';
 import { userAPI } from '@/utils';
 import { setError, setSuccess } from '@/redux/actions/snackbar';
 

@@ -32,7 +32,7 @@ import moment, { Moment } from 'moment';
 import clsx from 'clsx';
 
 // Types
-import { ITodo, ITodoValidations, IValidator } from '@/typings';
+import { ITodo, ITodoValidations, IValidator } from '@/types';
 
 // Utils
 import { todoAPI, Validator } from '@/utils';
@@ -43,7 +43,7 @@ import {
   updateTodo,
   deleteTodo,
   completeTodo,
-} from '@/redux/actions/todo';
+} from '@/redux/actions/list';
 import { setSuccess, setError } from '@/redux/actions/snackbar';
 
 // Components
