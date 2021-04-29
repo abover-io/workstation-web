@@ -1,13 +1,20 @@
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, FC } from 'react';
 
 import { Layout } from '@/components';
 
-export interface IHomeProps {}
+const Home: FC<{}> = () => {
+  const router = useRouter();
 
-export default function Home({}: IHomeProps) {
+  useEffect(() => {
+    router.replace('/home');
+  }, []);
+
   return (
     <Layout title={`Home`}>
-      <h1>THIS IS HOME</h1>
+      <div>Loading...</div>
     </Layout>
   );
-}
+};
+
+export default Home;
