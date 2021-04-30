@@ -11,10 +11,8 @@ export { default as Loading } from './loading';
 export { default as AppLayout } from './app/app-layout';
 
 // Todo Components
-export { default as TodoCard } from './todo/todo-card';
-export { default as TodoForm } from './todo/todo-form';
-export { default as TodoList } from './todo/todo-list';
-export { default as BlankTodoCard } from './todo/blank-todo-card';
+export { default as AddTodoForm } from './todo/add-todo-form';
+export { default as TodoItem } from './todo/todo-item';
 export { default as TodoDatePicker } from './todo/todo-date-picker';
 export { default as TodoTimeForm } from './todo/todo-time-form';
 export { default as TodoPriorityPicker } from './todo/todo-priority-picker';

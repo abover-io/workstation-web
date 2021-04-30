@@ -1,8 +1,6 @@
 import moment, { Moment } from 'moment';
 
-import { IValidator } from '@/types';
-
-export default class Validator implements IValidator {
+export default class Validator {
   public static Name(input: string): string | null {
     if (!input) {
       return 'Name cannot be empty!';
