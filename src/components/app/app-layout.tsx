@@ -15,7 +15,6 @@ import {
   ListItemText,
   Divider,
   useTheme,
-  Snackbar,
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
@@ -34,6 +33,9 @@ import { capitalize } from '@/utils';
 import { CustomHead } from '@/components';
 import { UserHeaderMenu } from '@/components/user';
 
+// Custom Hooks
+import { useAuth } from '@/hooks';
+
 export interface IAppLayoutProps {
   children: ReactNode;
 }
@@ -41,82 +43,85 @@ export interface IAppLayoutProps {
 export default function AppLayout({ children }: IAppLayoutProps) {
   const classes = useStyles();
   const theme = useTheme();
-  const router = useRouter();
-  const dispatch = useDispatch();
+  const user = useAuth().user;
   const [openMenu, setOpenMenu] = useState<boolean>(true);
 
   return (
-    <>
-      <CustomHead title={capitalize('adam')} />
-      <section className={classes.appLayoutWrapper}>
-        <CssBaseline />
-        <AppBar
-          position={`fixed`}
-          className={clsx(classes.appBar, { [classes.appBarShift]: openMenu })}
-        >
-          <Toolbar>
-            <IconButton
-              edge={`start`}
-              className={clsx(classes.menuButton, openMenu && classes.hide)}
-              color={`inherit`}
-              aria-label={`Menu`}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant={`h6`} className={classes.headerTitle}>
-              Fancy Todo
-            </Typography>
-            <UserHeaderMenu />
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          className={classes.drawer}
-          variant={`persistent`}
-          anchor={`left`}
-          open={openMenu}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-        >
-          <div className={classes.drawerHeader}>
-            <IconButton>
-              {theme.direction === 'ltr' ? (
-                <ChevronLeftIcon />
-              ) : (
-                <ChevronRightIcon />
-              )}
-            </IconButton>
-          </div>
-          <Divider />
-          <List>
-            {['Inbox', 'Today', 'Upcoming'].map((category) => (
-              <ListItem button key={category.toLowerCase()}>
-                <ListItemIcon>
-                  {category.toLowerCase() === 'inbox' ? (
-                    <InboxIcon />
-                  ) : category.toLowerCase() === 'today' ? (
-                    <TodayIcon />
-                  ) : category.toLowerCase() === 'upcoming' ? (
-                    <DateRangeIcon />
-                  ) : (
-                    ''
-                  )}
-                </ListItemIcon>
-                <ListItemText primary={category} />
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-        <main
-          className={clsx(classes.content, {
-            [classes.contentShift]: openMenu,
-          })}
-        >
-          <div className={classes.drawerHeader} />
-          {children}
-        </main>
-      </section>
-    </>
+    user && (
+      <>
+        <CustomHead title={capitalize('adam')} />
+        <section className={classes.appLayoutWrapper}>
+          <CssBaseline />
+          <AppBar
+            position={`fixed`}
+            className={clsx(classes.appBar, {
+              [classes.appBarShift]: openMenu,
+            })}
+          >
+            <Toolbar>
+              <IconButton
+                edge={`start`}
+                className={clsx(classes.menuButton, openMenu && classes.hide)}
+                color={`inherit`}
+                aria-label={`Menu`}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant={`h6`} className={classes.headerTitle}>
+                Fancy Todo
+              </Typography>
+              <UserHeaderMenu />
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            className={classes.drawer}
+            variant={`persistent`}
+            anchor={`left`}
+            open={openMenu}
+            classes={{
+              paper: classes.drawerPaper,
+            }}
+          >
+            <div className={classes.drawerHeader}>
+              <IconButton>
+                {theme.direction === 'ltr' ? (
+                  <ChevronLeftIcon />
+                ) : (
+                  <ChevronRightIcon />
+                )}
+              </IconButton>
+            </div>
+            <Divider />
+            <List>
+              {['Inbox', 'Today', 'Upcoming'].map((category) => (
+                <ListItem button key={category.toLowerCase()}>
+                  <ListItemIcon>
+                    {category.toLowerCase() === 'inbox' ? (
+                      <InboxIcon />
+                    ) : category.toLowerCase() === 'today' ? (
+                      <TodayIcon />
+                    ) : category.toLowerCase() === 'upcoming' ? (
+                      <DateRangeIcon />
+                    ) : (
+                      ''
+                    )}
+                  </ListItemIcon>
+                  <ListItemText primary={category} />
+                </ListItem>
+              ))}
+            </List>
+          </Drawer>
+          <main
+            className={clsx(classes.content, {
+              [classes.contentShift]: openMenu,
+            })}
+          >
+            <div className={classes.drawerHeader} />
+            {children}
+          </main>
+        </section>
+      </>
+    )
   );
 }
 

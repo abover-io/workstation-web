@@ -5,7 +5,7 @@ import {
   ListItem as MuiListItem,
   ListItemText,
 } from '@material-ui/core';
-import { ArrowForward as ArrowForwardIcon } from '@material-ui/icons';
+import { ArrowForwardIos as ArrowForwardIcon } from '@material-ui/icons';
 
 // Types
 import { IList } from '@/types/list';
@@ -21,6 +21,7 @@ const ListItem: FC<IListItemProps> = ({ list }: IListItemProps) => {
     <MuiListItem
       component={Paper}
       button
+      variant={`outlined`}
       onClick={() =>
         router.push({
           pathname: `/lists/${list._id}`,
