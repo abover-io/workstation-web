@@ -2,6 +2,7 @@ import React, { useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { useSnackbar } from 'notistack';
 import {
   Grid,
   TextField,
@@ -26,18 +27,23 @@ import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 import update from 'immutability-helper';
 
+// Config
+import { GOOGLE_OAUTH_CLIENT_ID } from '@/config';
+
 // Typings
-import { ISignUpData, ISignUpValidations, IValidationFromAPI } from '@/types';
+import { ISignUpFormData, ISignUpFormValidations } from '@/types/auth';
 
 // Components
 import { Layout } from '@/components';
 
+// APIs
+import { AuthAPI } from '@/apis';
+
 // Utils
-import { userAPI, Validator, GOOGLE_OAUTH_CLIENT_ID } from '@/utils';
+import { UserValidator } from '@/utils/validator';
 
 // Redux Actions
 import { setUser } from '@/redux/actions/auth';
-import { setSuccess, setError } from '@/redux/actions/snackbar';
 
 type SignUpStep = 'email' | 'name-password';
 
@@ -45,98 +51,135 @@ export default function SignUp() {
   const classes = useStyles();
   const router = useRouter();
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
   const [currentStep, setCurrentStep] = useState<SignUpStep>('email');
-  const [signUpData, setSignUpData] = useState<ISignUpData>({
+  const [formData, setFormData] = useState<ISignUpFormData>({
     name: '',
     email: '',
     password: '',
   });
-  const [signUpErrors, setSignUpErrors] = useState<ISignUpValidations>({
-    name: null,
-    username: null,
-    email: null,
-    password: null,
+  const [validations, setValidations] = useState<ISignUpFormValidations>({
+    name: {
+      error: false,
+      text: '',
+    },
+    email: {
+      error: false,
+      text: '',
+    },
+    password: {
+      error: false,
+      text: '',
+    },
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const checkSignUpErrors = () => {
-    const { name, email, password } = signUpData;
-    const checkedSignUpErrors: ISignUpValidations = {
-      name: Validator.Name(name),
-      email: Validator.email(email),
-      password: Validator.password(password),
-    };
-
-    setSignUpErrors({
-      ...signUpErrors,
-      ...checkedSignUpErrors,
-    });
-
-    if (
-      Object.values(checkedSignUpErrors).every(
-        (checkedSignUpError) => checkedSignUpError === null,
-      )
-    ) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const handleOnChange = (
+  const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
+    switch (e.target.name as keyof ISignUpFormValidations) {
+      case 'name':
+        const nameValidation = UserValidator.Name(e.target.value);
+        setValidations(
+          update(validations, {
+            name: {
+              $set: nameValidation,
+            },
+          }),
+        );
+        setFormData(
+          update(formData, {
+            name: {
+              $set: e.target.value,
+            },
+          }),
+        );
+        break;
+
+      case 'email':
+        const emailValidation = UserValidator.Email(e.target.value);
+        setValidations(
+          update(validations, {
+            email: {
+              $set: emailValidation,
+            },
+          }),
+        );
+        setFormData(
+          update(formData, {
+            email: {
+              $set: e.target.value,
+            },
+          }),
+        );
+        break;
+
+      case 'password':
+        const passwordValidation = UserValidator.Password(e.target.value);
+        setValidations(
+          update(validations, {
+            password: {
+              $set: passwordValidation,
+            },
+          }),
+        );
+        setFormData(
+          update(formData, {
+            password: {
+              $set: e.target.value,
+            },
+          }),
+        );
+        break;
+
+      default:
+        break;
+    }
   };
 
   const handleSignUp = async (
     e: FormEvent<HTMLFormElement | HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setLoading(true);
-    e.preventDefault();
-    const { name, email, password } = signUpData;
     try {
-      if (checkSignUpErrors()) {
-        const { data } = await userAPI.post('/signup', {
-          name,
-          email,
-          password,
+      e.preventDefault();
+
+      setLoading(true);
+
+      if (Object.values(validations).every((v) => v.error === false)) {
+        const { data } = await AuthAPI.post('/signup', {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
         });
+
         dispatch(setUser(data.user));
-        localStorage.setItem('user', JSON.stringify(data.user));
-        dispatch(setSuccess(data.message));
-        await router.push('/app');
-        setLoading(false);
+
+        enqueueSnackbar(data.message, {
+          variant: 'success',
+        });
+
+        router.push('/app');
       } else {
-        setLoading(false);
-        // throw something to the snackbar
+        // handle here
       }
     } catch (err) {
+      setLoading(false);
+
       if (err.response) {
         switch (err.response.status) {
           case 400:
-            dispatch(setError(err.response.data.message));
-            if (err.response.data.messages) {
-              const signUpErrorsFromAPI: ISignUpValidations = {} as ISignUpValidations;
-              err.response.data.messages.forEach(
-                (signUpError: IValidationFromAPI) => {
-                  signUpErrorsFromAPI[signUpError.name] = signUpError.message;
-                },
-              );
-              setSignUpErrors({
-                ...signUpErrors,
-                ...signUpErrorsFromAPI,
-              });
+            if (err.response.data.vallidations) {
+              setValidations(err.response.data.vallidations);
             }
             break;
 
           default:
-            dispatch(setError(err.response.data.message));
+            enqueueSnackbar(err.response.data.message, {
+              variant: 'error',
+            });
             break;
         }
-
-        setLoading(false);
       }
     }
   };
@@ -144,34 +187,37 @@ export default function SignUp() {
   const googleSignInOnSuccess = async (
     response: GoogleLoginResponse | GoogleLoginResponseOffline,
   ): Promise<void> => {
-    setLoading(true);
-
     try {
-      const { data } = await userAPI.post('/auth/google', {
+      setLoading(true);
+
+      const { data } = await AuthAPI.post('/auth/google', {
         googleIdToken: (response as GoogleLoginResponse).tokenId,
       });
 
       dispatch(setUser(data.user));
-      localStorage.setItem('user', JSON.stringify(data.user));
 
-      dispatch(setSuccess(data.message));
+      enqueueSnackbar(data.message, {
+        variant: 'success',
+      });
+
+      router.push('/app');
 
       setLoading(false);
-
-      await router.push('/app');
     } catch (err) {
       setLoading(false);
 
       if (err.response) {
-        if (err.response.data) {
-          dispatch(setError(err.response.data.message));
-        }
+        enqueueSnackbar(err.response.data.message, {
+          variant: 'error',
+        });
       }
     }
   };
 
   const googleSignInOnFailure = (err: any): void => {
-    dispatch(setError(err.response.data.message));
+    enqueueSnackbar(err.response.data.message, {
+      variant: 'error',
+    });
   };
 
   const handleValidateCurrentStep = (
@@ -181,16 +227,16 @@ export default function SignUp() {
     e.preventDefault();
 
     if (step === 'email') {
-      const emailValidation = Validator.email(signUpData.email);
-      setSignUpErrors(
-        update(signUpErrors, {
+      const emailValidation = UserValidator.Email(formData.email);
+      setValidations(
+        update(validations, {
           email: {
             $set: emailValidation,
           },
         }),
       );
 
-      if (emailValidation === null) {
+      if (!emailValidation.error) {
         setCurrentStep('name-password');
       }
     }
@@ -252,12 +298,10 @@ export default function SignUp() {
                 required
                 type={`email`}
                 label={`Email`}
-                value={signUpData.email}
-                onChange={handleOnChange}
-                error={
-                  signUpErrors.email !== null && signUpErrors.email.length > 0
-                }
-                helperText={signUpErrors.email}
+                value={formData.email}
+                onChange={handleChange}
+                error={validations.email.error}
+                helperText={validations.email.text}
                 disabled={loading}
                 size={`small`}
                 variant={`outlined`}
@@ -292,7 +336,7 @@ export default function SignUp() {
               startIcon={<ArrowBackIcon />}
               size={`small`}
             >
-              {signUpData.email}
+              {formData.email}
             </Button>
           </Grid>
 
@@ -318,12 +362,10 @@ export default function SignUp() {
                 fullWidth
                 required
                 label={`Your name`}
-                value={signUpData.name}
-                onChange={handleOnChange}
-                error={
-                  signUpErrors.name !== null && signUpErrors.name.length > 0
-                }
-                helperText={signUpErrors.name}
+                value={formData.name}
+                onChange={handleChange}
+                error={validations.name.error}
+                helperText={validations.name.text}
                 disabled={loading}
                 size={`small`}
                 variant={`outlined`}
@@ -338,16 +380,12 @@ export default function SignUp() {
                 required
                 type={showPassword ? `text` : `password`}
                 label={`Password`}
-                value={signUpData.password}
-                onChange={handleOnChange}
-                error={
-                  signUpErrors.password !== null &&
-                  signUpErrors.password.length > 0
-                }
+                value={formData.password}
+                onChange={handleChange}
+                error={validations.password.error}
                 helperText={
-                  signUpErrors.password !== null &&
-                  signUpErrors.password.length > 0
-                    ? signUpErrors.password
+                  validations.password.error
+                    ? validations.password.text
                     : `At least 6 characters.`
                 }
                 disabled={loading}
