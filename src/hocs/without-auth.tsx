@@ -12,7 +12,7 @@ export default function withoutAuth<P>(
     WrappedComponent,
     location,
     clientCondition: function withoutAuthClientCondition(): boolean {
-      return !!cookie.parse(document.cookie)['XSRF-TOKEN'];
+      return !!cookie.parse(document.cookie)['_csrf'];
     },
     serverCondition: function withoutAuthServerCondition(ctx) {
       return !!ctx.req?.cookies['act'];

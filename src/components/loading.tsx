@@ -1,20 +1,14 @@
-import React from 'react';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import React, { FC } from 'react';
 import { LinearProgress, Grid } from '@material-ui/core';
 import { AssignmentTurnedIn as AssignmentTurnedInIcon } from '@material-ui/icons';
 
 import Container from './container';
 
-export interface ILoadingProps {}
-
-export default function Loading({}: ILoadingProps) {
-  const classes = useStyles();
-
+const Loading: FC<{}> = () => {
   return (
     <Container>
       <Grid
         container
-        classes={{ root: classes.loadingWrapper }}
         justify={`center`}
         alignContent={`center`}
         direction={`column`}
@@ -28,11 +22,6 @@ export default function Loading({}: ILoadingProps) {
       </Grid>
     </Container>
   );
-}
+};
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    loadingWrapper: {
-    },
-  }),
-);
+export default Loading;

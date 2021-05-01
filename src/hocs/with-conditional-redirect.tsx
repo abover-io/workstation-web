@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { LinearProgress } from '@material-ui/core';
 
 // Typings
 import { CookiesPageContext } from '@/types';
+
+// Components
+import { Loading } from '@/components';
 
 function isBrowser(): boolean {
   return typeof window !== 'undefined';
@@ -23,7 +24,6 @@ export default function withConditionalRedirect<CP = {}, IP = CP>({
   location: string;
 }): NextPage<CP, IP> {
   const WithConditionalRedirectWrapper: NextPage<CP, IP> = (props) => {
-    const classes = useStyles();
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -31,7 +31,7 @@ export default function withConditionalRedirect<CP = {}, IP = CP>({
       const redirectCondition: boolean = clientCondition();
 
       if (isBrowser() && redirectCondition) {
-        await router.replace(location);
+        await router.push(location);
         return;
       }
 
@@ -42,16 +42,7 @@ export default function withConditionalRedirect<CP = {}, IP = CP>({
       checkRedirectCondition();
     }, []);
 
-    return loading ? (
-      <section className={classes.wrapper}>
-        <LinearProgress
-          classes={{ root: classes.linearProgress }}
-          color={`secondary`}
-        />
-      </section>
-    ) : (
-      <WrappedComponent {...props} />
-    );
+    return loading ? <Loading /> : <WrappedComponent {...props} />;
   };
 
   WithConditionalRedirectWrapper.getInitialProps = async (ctx): Promise<IP> => {
@@ -73,20 +64,3 @@ export default function withConditionalRedirect<CP = {}, IP = CP>({
 
   return WithConditionalRedirectWrapper;
 }
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    wrapper: {
-      width: '100%',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    linearProgress: {
-      width: theme.spacing(64),
-    },
-  }),
-);

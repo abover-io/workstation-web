@@ -2,7 +2,7 @@
 import { Validation } from '@/types';
 
 export default class TodoValidator {
-  public static todoName(input: string): Validation {
+  public static Name(input: string): Validation {
     if (!input) {
       return {
         error: true,

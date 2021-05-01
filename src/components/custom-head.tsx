@@ -1,18 +1,18 @@
-import React, { ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import Head from 'next/head';
 
-export interface IHeadProps {
+type CustomHeadProps = {
   title?: string;
   children?: ReactNode;
-}
+};
 
-export default function CustomHead(props: IHeadProps) {
-  const { title, children } = props;
-
+const CustomHead: FC<CustomHeadProps> = ({ title, children }) => {
   return (
     <Head>
       <title> {`${title} | Fancy Todo`} </title>
       {children}
     </Head>
   );
-}
+};
+
+export default CustomHead;

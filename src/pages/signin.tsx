@@ -1,7 +1,8 @@
-import React, { useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
+import React, { FC, useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { useSnackbar } from 'notistack';
 import {
   Grid,
   TextField,
@@ -24,68 +25,94 @@ import {
 } from 'react-google-login';
 import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
+import update from 'immutability-helper';
 
+// Config
+import { GOOGLE_OAUTH_CLIENT_ID } from '@/config';
+
+// Types
+import { ISignInFormValidations, ISignInFormData } from '@/types/auth';
+
+// HOCs
+import { withoutAuth } from '@/hocs';
+
+// Components
 import { Layout } from '@/components';
 
 // APIs
 import { AuthAPI } from '@/apis';
 
-import { Validator, GOOGLE_OAUTH_CLIENT_ID } from '@/utils';
+// Utils
+import { UserValidator } from '@/utils/validator';
 
 // Redux Actions
 import { setUser } from '@/redux/actions/auth';
-import { setError, setSuccess } from '@/redux/actions/snackbar';
 
-// Types
-import { ISignInValidations, IValidator, IValidationFromAPI } from '@/types';
-
-export default function SignIn() {
+const SignIn: FC<{}> = () => {
   const classes = useStyles();
   const router = useRouter();
   const dispatch = useDispatch();
-  const [signInData, setSignInData] = useState({
-    userIdentifier: '',
+  const { enqueueSnackbar } = useSnackbar();
+  const [formData, setFormData] = useState<ISignInFormData>({
+    email: '',
     password: '',
   });
-  const [signInErrors, setSignInErrors] = useState<ISignInValidations>({
-    userIdentifier: null,
-    password: null,
+  const [validations, setValidations] = useState<ISignInFormValidations>({
+    email: {
+      error: false,
+      text: '',
+    },
+    password: {
+      error: false,
+      text: '',
+    },
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const checkSignInErrors = (): boolean => {
-    const { userIdentifier, password } = signInData;
-    const checkedSignInErrors: ISignInValidations = {
-      userIdentifier: Validator.userIdentifier(userIdentifier),
-      password: Validator.password(password),
-    };
-
-    setSignInErrors({
-      ...signInErrors,
-      ...checkedSignInErrors,
-    });
-
-    if (
-      Object.values(checkedSignInErrors).every(
-        (checkedSignInError) => checkedSignInError === null,
-      )
-    ) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const handleOnChange = (
+  const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void => {
-    setSignInErrors({
-      ...signInErrors,
-      [e.target.name]: (Validator as IValidator)[e.target.name](e.target.value),
-    });
+    switch (e.target.name as keyof ISignInFormValidations) {
+      case 'email':
+        const emailValidation = UserValidator.Email(e.target.value);
+        setValidations(
+          update(validations, {
+            email: {
+              $set: emailValidation,
+            },
+          }),
+        );
+        setFormData(
+          update(formData, {
+            email: {
+              $set: e.target.value,
+            },
+          }),
+        );
+        break;
 
-    setSignInData({ ...signInData, [e.target.name]: e.target.value });
+      case 'password':
+        const passwordValidation = UserValidator.Password(e.target.value);
+        setValidations(
+          update(validations, {
+            password: {
+              $set: passwordValidation,
+            },
+          }),
+        );
+        setFormData(
+          update(formData, {
+            password: {
+              $set: e.target.value,
+            },
+          }),
+        );
+        break;
+
+      default:
+        break;
+    }
   };
 
   const handleSignIn = async (
@@ -93,51 +120,44 @@ export default function SignIn() {
       | FormEvent<HTMLFormElement | HTMLInputElement | HTMLTextAreaElement>
       | MouseEvent<HTMLButtonElement>,
   ): Promise<void> => {
-    setLoading(true);
-    e.preventDefault();
-    const { userIdentifier, password } = signInData;
-
     try {
-      if (checkSignInErrors()) {
+      e.preventDefault();
+
+      setLoading(true);
+
+      if (Object.values(validations).every((v) => v.error === false)) {
         const { data } = await AuthAPI.post('/signin', {
-          userIdentifier,
-          password,
+          email: formData.email,
+          password: formData.password,
         });
 
         dispatch(setUser(data.user));
-        localStorage.setItem('user', JSON.stringify(data.user));
 
-        dispatch(setSuccess(data.message));
+        enqueueSnackbar(data.message, {
+          variant: 'success',
+        });
 
-        await router.push('/app');
-        setLoading(false);
+        router.push('/app');
       } else {
-        setLoading(false);
         // handle here
       }
+
+      setLoading(false);
     } catch (err) {
       setLoading(false);
 
       if (err.response) {
         switch (err.response.status) {
           case 400:
-            dispatch(setError(err.response.data.message));
-            if (err.response.data.messages) {
-              const signInErrorsFromAPI: ISignInValidations = {} as ISignInValidations;
-              err.response.data.messages.forEach(
-                (signInError: IValidationFromAPI) => {
-                  signInErrorsFromAPI[signInError.name] = signInError.message;
-                },
-              );
-              setSignInErrors({
-                ...signInErrors,
-                ...signInErrorsFromAPI,
-              });
+            if (err.response.data.vallidations) {
+              setValidations(err.response.data.vallidations);
             }
             break;
 
           default:
-            dispatch(setError(err.response.data.message));
+            enqueueSnackbar(err.response.data.message, {
+              variant: 'error',
+            });
             break;
         }
       }
@@ -147,34 +167,37 @@ export default function SignIn() {
   const googleSignInOnSuccess = async (
     response: GoogleLoginResponse | GoogleLoginResponseOffline,
   ): Promise<void> => {
-    setLoading(true);
-
     try {
+      setLoading(true);
+
       const { data } = await AuthAPI.post('/auth/google', {
         googleIdToken: (response as GoogleLoginResponse).tokenId,
       });
 
       dispatch(setUser(data.user));
-      localStorage.setItem('user', JSON.stringify(data.user));
 
-      dispatch(setSuccess(data.message));
+      enqueueSnackbar(data.message, {
+        variant: 'success',
+      });
+
+      router.push('/app');
 
       setLoading(false);
-
-      await router.push('/app');
     } catch (err) {
       setLoading(false);
 
       if (err.response) {
-        if (err.response.data) {
-          dispatch(setError(err.response.data.message));
-        }
+        enqueueSnackbar(err.response.data.message, {
+          variant: 'error',
+        });
       }
     }
   };
 
   const googleSignInOnFailure = (err: any): void => {
-    dispatch(setError(err.response.data.message));
+    enqueueSnackbar(err.response.data.message, {
+      variant: 'error',
+    });
   };
 
   return (
@@ -226,17 +249,14 @@ export default function SignIn() {
           <Grid item>
             <TextField
               fullWidth
-              autoComplete={`username`}
-              label={`Username or Email`}
-              name={`userIdentifier`}
+              autoComplete={`email`}
+              label={`Email`}
+              name={`email`}
               required
-              value={signInData.userIdentifier}
-              onChange={handleOnChange}
-              error={
-                signInErrors.userIdentifier !== null &&
-                signInErrors.userIdentifier.length > 0
-              }
-              helperText={signInErrors.userIdentifier}
+              value={formData.email}
+              onChange={handleChange}
+              error={validations.email.error}
+              helperText={validations.email.text}
               disabled={loading}
               variant={`outlined`}
               size={`small`}
@@ -251,13 +271,10 @@ export default function SignIn() {
               name={`password`}
               required
               type={showPassword ? `text` : `password`}
-              value={signInData.password}
-              onChange={handleOnChange}
-              error={
-                signInErrors.password !== null &&
-                signInErrors.password.length > 0
-              }
-              helperText={signInErrors.password}
+              value={formData.password}
+              onChange={handleChange}
+              error={validations.email.error}
+              helperText={validations.email.text}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position={`end`}>
@@ -325,7 +342,9 @@ export default function SignIn() {
       </Grid>
     </Layout>
   );
-}
+};
+
+export default withoutAuth(SignIn);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

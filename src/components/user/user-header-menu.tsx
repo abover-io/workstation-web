@@ -1,7 +1,5 @@
-import React, { useState, MouseEvent } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { FC, useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
 import {
   IconButton,
   Avatar,
@@ -9,20 +7,18 @@ import {
   MenuList,
   MenuItem,
 } from '@material-ui/core';
+import { useSnackbar } from 'notistack';
 
-import { IUser, IRootState } from '@/types';
-import { userAPI } from '@/utils';
-import { setError, setSuccess } from '@/redux/actions/snackbar';
+// APIs
+import { UserAPI } from '@/apis';
 
-export interface IUserHeaderMenuProps {}
+// Custom Hooks
+import { useAuth } from '@/hooks';
 
-export default function UserHeaderMenu({}: IUserHeaderMenuProps) {
-  const classes = useStyles();
-  const dispatch = useDispatch();
+const UserHeaderMenu: FC<{}> = () => {
   const router = useRouter();
-  const user: IUser = useSelector(
-    (state: IRootState) => state.user.currentUser,
-  );
+  const { enqueueSnackbar } = useSnackbar();
+  const user = useAuth().user!;
   const [menuButton, setMenuButton] = useState<HTMLElement | null>(null);
 
   const handleShowMenu = (e: MouseEvent<HTMLButtonElement>): void => {
@@ -35,33 +31,38 @@ export default function UserHeaderMenu({}: IUserHeaderMenuProps) {
 
   const handleSignOut = async (): Promise<void> => {
     try {
-      const { data } = await userAPI.post('/signout');
+      const { data } = await UserAPI.post('/signout');
       localStorage.clear();
-      dispatch(setSuccess(data.message));
+      enqueueSnackbar(data.message, {
+        variant: 'success',
+      });
       await router.push('/signin');
     } catch (err) {
       if (err.response) {
         if (err.response.data) {
-          dispatch(setError(err.response.data.message, err.response.data.name));
+          enqueueSnackbar(err.response.data.message, {
+            variant: 'error',
+          });
         } else {
-          dispatch(setError('Unknown error has occured!'));
+          enqueueSnackbar('Unknown error has occured!', {
+            variant: 'error',
+          });
         }
       }
     }
   };
 
   return (
-    <div className={classes.menuWrapper}>
+    <>
       <IconButton onClick={handleShowMenu} color={`inherit`}>
         {user.profileImageURL && user.profileImageURL.length > 0 ? (
-          <Avatar alt={user.username} src={user.profileImageURL} />
+          <Avatar alt={user.email} src={user.profileImageURL} />
         ) : (
           <Avatar>
-            {user.lastName && user.lastName.length > 0
-              ? `${user.firstName[0].concat(user.lastName[0]).toUpperCase()}`
-              : user.firstName && user.firstName.length > 0
-              ? user.firstName[0].toUpperCase()
-              : ''}
+            {user.name
+              .split(' ')
+              .map((c) => c.toUpperCase())
+              .join('')}
           </Avatar>
         )}
       </IconButton>
@@ -84,12 +85,8 @@ export default function UserHeaderMenu({}: IUserHeaderMenuProps) {
           <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
         </MenuList>
       </Popover>
-    </div>
+    </>
   );
-}
+};
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    menuWrapper: {},
-  }),
-);
+export default UserHeaderMenu;

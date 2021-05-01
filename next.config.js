@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   sassOptions: {
-    includePaths: [path.join(__dirname, 'src', 'styles')]
+    includePaths: [path.join(__dirname, 'src', 'styles')],
   },
   webpack(config) {
     config.module.rules.push({
@@ -15,5 +15,6 @@ module.exports = {
 
     return config;
   },
-  distDir: '.next'
+  distDir: '.next',
+  basePath: '/todo',
 };

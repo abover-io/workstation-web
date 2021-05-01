@@ -1,19 +1,19 @@
-import React, { ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
-export interface IContainerProps {
+type ContainerProps = {
   display?: 'flex' | 'grid' | string | undefined;
   justify?: 'center' | 'start' | 'end' | string | undefined;
   align?: 'center' | 'start' | 'end' | string | undefined;
   children?: ReactNode;
-}
+};
 
-export default function Container({
+const Container: FC<ContainerProps> = ({
   display = 'flex',
   justify = 'center',
   align = 'center',
   children,
-}: IContainerProps) {
+}) => {
   const classes = useStyles({ justify, align });
 
   return (
@@ -25,9 +25,11 @@ export default function Container({
       {children}
     </main>
   );
-}
+};
 
-const useStyles = makeStyles<Theme, IContainerProps>(() =>
+export default Container;
+
+const useStyles = makeStyles<Theme, ContainerProps>(() =>
   createStyles({
     containerFlex: {
       display: 'flex',

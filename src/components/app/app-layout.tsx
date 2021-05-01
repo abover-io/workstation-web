@@ -1,5 +1,5 @@
-import React, { useState, useEffect, ReactNode } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, ReactNode } from 'react';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import {
@@ -17,7 +17,6 @@ import {
   useTheme,
   Snackbar,
 } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
@@ -28,18 +27,12 @@ import {
 } from '@material-ui/icons';
 import clsx from 'clsx';
 
-// Redux Actions
-import { setSelectedTodoCategory } from '@/redux/actions/current';
-import { resetSnackbar } from '@/redux/actions/snackbar';
-
 // Utils
 import { capitalize } from '@/utils';
 
-// Types
-import { IRootState, ISnackbarOptions } from '@/types';
-
 // Components
-import { CustomHead, UserHeaderMenu } from '@/components';
+import { CustomHead } from '@/components';
+import { UserHeaderMenu } from '@/components/user';
 
 export interface IAppLayoutProps {
   children: ReactNode;
@@ -50,81 +43,11 @@ export default function AppLayout({ children }: IAppLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useDispatch();
-  const { selectedTodoCategory } = useSelector(
-    (state: IRootState) => state.current,
-  );
-  const snackbar = useSelector((state: IRootState) => state.snackbar);
   const [openMenu, setOpenMenu] = useState<boolean>(true);
-  const [snackbarOptions, setSnackbarOptions] = useState<ISnackbarOptions>({
-    severity: undefined,
-    message: null,
-    open: false,
-  });
-
-  useEffect(() => {
-    if (snackbar.info && snackbar.info.length > 0) {
-      setSnackbarOptions({
-        severity: 'info',
-        message: snackbar.info,
-        open: true,
-      });
-    } else if (snackbar.warning && snackbar.warning.length > 0) {
-      setSnackbarOptions({
-        severity: 'warning',
-        message: snackbar.warning,
-        open: true,
-      });
-    } else if (snackbar.error && snackbar.error.length > 0) {
-      setSnackbarOptions({
-        severity: 'error',
-        message: snackbar.error,
-        open: true,
-      });
-    } else if (snackbar.success && snackbar.success.length > 0) {
-      setSnackbarOptions({
-        severity: 'success',
-        message: snackbar.success,
-        open: true,
-      });
-    } else {
-      setSnackbarOptions({
-        ...snackbarOptions,
-        open: false,
-        message: null,
-      });
-    }
-  }, [snackbar]);
-
-  const handleCloseSnackbar = (): void => {
-    dispatch(resetSnackbar());
-
-    setSnackbarOptions({
-      ...snackbarOptions,
-      open: false,
-      message: null,
-    });
-  };
-
-  const handleCloseAlert = (): void => {
-    dispatch(resetSnackbar());
-
-    setSnackbarOptions({
-      ...snackbarOptions,
-      open: false,
-      message: null,
-    });
-  };
-
-  const handleMenuOpen = (): void => setOpenMenu(true);
-  const handleMenuClose = (): void => setOpenMenu(false);
-
-  const handleTodoCategoryChange = (category: string): void => {
-    dispatch(setSelectedTodoCategory(category));
-  };
 
   return (
     <>
-      <CustomHead title={capitalize(selectedTodoCategory)} />
+      <CustomHead title={capitalize('adam')} />
       <section className={classes.appLayoutWrapper}>
         <CssBaseline />
         <AppBar
@@ -137,7 +60,6 @@ export default function AppLayout({ children }: IAppLayoutProps) {
               className={clsx(classes.menuButton, openMenu && classes.hide)}
               color={`inherit`}
               aria-label={`Menu`}
-              onClick={handleMenuOpen}
             >
               <MenuIcon />
             </IconButton>
@@ -157,7 +79,7 @@ export default function AppLayout({ children }: IAppLayoutProps) {
           }}
         >
           <div className={classes.drawerHeader}>
-            <IconButton onClick={handleMenuClose}>
+            <IconButton>
               {theme.direction === 'ltr' ? (
                 <ChevronLeftIcon />
               ) : (
@@ -168,14 +90,7 @@ export default function AppLayout({ children }: IAppLayoutProps) {
           <Divider />
           <List>
             {['Inbox', 'Today', 'Upcoming'].map((category) => (
-              <ListItem
-                button
-                key={category.toLowerCase()}
-                onClick={() => handleTodoCategoryChange(category.toLowerCase())}
-                selected={
-                  selectedTodoCategory.toLowerCase() === category.toLowerCase()
-                }
-              >
+              <ListItem button key={category.toLowerCase()}>
                 <ListItemIcon>
                   {category.toLowerCase() === 'inbox' ? (
                     <InboxIcon />
@@ -201,21 +116,6 @@ export default function AppLayout({ children }: IAppLayoutProps) {
           {children}
         </main>
       </section>
-
-      <Snackbar
-        open={snackbarOptions.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert
-          severity={snackbarOptions.severity}
-          onClose={handleCloseAlert}
-          variant={`filled`}
-          elevation={6}
-        >
-          {snackbarOptions.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 }

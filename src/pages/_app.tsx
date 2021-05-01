@@ -1,8 +1,10 @@
 import 'fontsource-roboto';
 
-import React, { useEffect, useCallback, useState } from 'react';
-import NextApp, { AppProps, AppContext } from 'next/app';
-import { useRouter } from 'next/router';
+import React, { useEffect, useCallback } from 'react';
+import NextApp, {
+  AppProps as NextAppProps,
+  AppContext as NextAppContext,
+} from 'next/app';
 import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
@@ -27,40 +29,22 @@ import { muiTheme } from '@/styles';
 // APIs
 import { AuthAPI } from '@/apis';
 
-interface CustomAppProps extends AppProps {
+interface AppProps extends NextAppProps {
   authenticated: boolean;
 }
 
-interface CustomAppContext extends AppContext {}
+interface AppContext extends NextAppContext {}
 
-export default function App({
-  authenticated,
-  Component,
-  pageProps,
-}: CustomAppProps) {
-  const router = useRouter();
-  const [loading, setLoading] = useState<boolean>(true);
-
+export default function App({ authenticated, pageProps, Component }: AppProps) {
   const checkAuth = useCallback(async () => {
-    setLoading(true);
-
     if (authenticated && !reduxStore.getState().auth.user) {
       const { data } = await AuthAPI.get('/sync');
-
       reduxStore.dispatch(setUser(data.user));
-
-      setLoading(false);
-    } else {
-      await router.push('/signin');
     }
   }, [authenticated]);
 
   useEffect(() => {
     checkAuth();
-
-    return () => {
-      setLoading(false);
-    };
   }, []);
 
   return (
@@ -68,7 +52,7 @@ export default function App({
       <MuiThemeProvider theme={muiTheme}>
         <MuiPickersUtilsProvider utils={MomentUtils}>
           <SnackbarProvider maxSnack={5}>
-            {loading ? <Loading /> : <Component {...pageProps} />}
+            <Component {...pageProps} />
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
       </MuiThemeProvider>
@@ -76,13 +60,13 @@ export default function App({
   );
 }
 
-App.getInitialProps = async (appCtx: CustomAppContext) => {
+App.getInitialProps = async (appCtx: AppContext) => {
   let authenticated: boolean = false;
 
   const req = appCtx.ctx.req as CookieMessage;
 
   if (req) {
-    req.cookies = cookie.parse(req.headers.cookie as string);
+    req.cookies = cookie.parse(req.headers.cookie + '');
 
     authenticated = !!req.cookies.act;
   }
