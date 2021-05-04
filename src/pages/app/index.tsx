@@ -1,5 +1,7 @@
 import React, { FC, useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { Grid, Typography } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 
 // HOCs
@@ -19,6 +21,7 @@ import { setLists } from '@/redux/actions/list';
 import { useList } from '@/hooks';
 
 const App: FC<{}> = () => {
+  const classes = useStyles();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState<boolean>(false);
@@ -49,16 +52,35 @@ const App: FC<{}> = () => {
   }, []);
 
   return (
-    <AppLayout>
-      <h2>Loading: {loading}</h2>
+    <AppLayout title={`My Lists`}>
+      <Grid container direction={`column`} alignItems={`stretch`}>
+        <Grid item>
+          <Typography
+            className={classes.title}
+            variant={`h6`}
+            align={`left`}
+            gutterBottom
+          >
+            My Lists
+          </Typography>
+        </Grid>
 
-      <h1>My Lists</h1>
-
-      {list.map((list) => (
-        <ListItem key={list._id} list={list} />
-      ))}
+        {list.map((list) => (
+          <Grid item key={list._id}>
+            <ListItem list={list} />
+          </Grid>
+        ))}
+      </Grid>
     </AppLayout>
   );
 };
 
 export default withAuth(App);
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    title: {
+      fontWeight: theme.typography.fontWeightBold,
+    },
+  }),
+);

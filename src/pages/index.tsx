@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, FC } from 'react';
 
-import { Layout } from '@/components';
+import { Layout, Loading } from '@/components';
 
-const Home: FC<{}> = () => {
+const Index: FC<{}> = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -11,10 +11,10 @@ const Home: FC<{}> = () => {
   }, []);
 
   return (
-    <Layout title={`Home`}>
-      <div>Loading...</div>
+    <Layout>
+      <Loading />
     </Layout>
   );
 };
 
-export default Home;
+export default Index;

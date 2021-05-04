@@ -4,7 +4,7 @@ import React, { FC, ReactNode } from 'react';
 import CustomHead from './custom-head';
 
 type AppLayoutProps = {
-  title: string;
+  title?: string;
   children: ReactNode;
 };
 

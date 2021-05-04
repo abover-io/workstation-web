@@ -48,7 +48,7 @@ export default function withConditionalRedirect<CP = {}, IP = CP>({
   WithConditionalRedirectWrapper.getInitialProps = async (ctx): Promise<IP> => {
     if (!isBrowser() && ctx.res) {
       if (serverCondition(ctx as CookiesPageContext)) {
-        ctx.res.writeHead(302);
+        ctx.res.writeHead(302, { location: '/todo/signin' });
         ctx.res.end();
       }
     }

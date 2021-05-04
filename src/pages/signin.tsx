@@ -170,7 +170,7 @@ const SignIn: FC<{}> = () => {
     try {
       setLoading(true);
 
-      const { data } = await AuthAPI.post('/auth/google', {
+      const { data } = await AuthAPI.post('/google', {
         googleIdToken: (response as GoogleLoginResponse).tokenId,
       });
 

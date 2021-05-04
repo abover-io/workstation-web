@@ -61,7 +61,7 @@ const UserHeaderMenu: FC<{}> = () => {
           <Avatar>
             {user.name
               .split(' ')
-              .map((c) => c.toUpperCase())
+              .map((n) => n[0].toUpperCase())
               .join('')}
           </Avatar>
         )}

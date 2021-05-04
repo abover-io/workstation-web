@@ -5,6 +5,7 @@ import NextApp, {
   AppProps as NextAppProps,
   AppContext as NextAppContext,
 } from 'next/app';
+import { useRouter } from 'next/router';
 import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
@@ -36,10 +37,21 @@ interface AppProps extends NextAppProps {
 interface AppContext extends NextAppContext {}
 
 export default function App({ authenticated, pageProps, Component }: AppProps) {
+  const router = useRouter();
+
   const checkAuth = useCallback(async () => {
-    if (authenticated && !reduxStore.getState().auth.user) {
-      const { data } = await AuthAPI.get('/sync');
-      reduxStore.dispatch(setUser(data.user));
+    try {
+      if (authenticated && reduxStore.getState().auth.user === null) {
+        const { data } = await AuthAPI.get('/sync');
+        reduxStore.dispatch(setUser(data.user));
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 401) {
+          await AuthAPI.post('/signout');
+          await router.replace('/signin');
+        }
+      }
     }
   }, [authenticated]);
 
