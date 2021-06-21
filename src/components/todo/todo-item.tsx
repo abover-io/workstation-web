@@ -2,10 +2,10 @@ import React, { FC } from 'react';
 import { Grid, Typography, Divider } from '@material-ui/core';
 
 // Types
-import { ITodo } from '@/types/todo';
+import { Todo } from '@/types/todo';
 
 type TodoItemProps = {
-  todo: ITodo;
+  todo: Todo;
 };
 
 const TodoItem: FC<TodoItemProps> = ({ todo }) => {

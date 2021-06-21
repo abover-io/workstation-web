@@ -27,17 +27,17 @@ import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 import update from 'immutability-helper';
 
+// API
+import api from '@/api';
+
 // Config
-import { GOOGLE_OAUTH_CLIENT_ID } from '@/config';
+import { GOOGLE_OAUTH_WEB_CLIENT_ID } from '@/config';
 
 // Typings
 import { ISignUpFormData, ISignUpFormValidations } from '@/types/auth';
 
 // Components
 import { Layout } from '@/components';
-
-// APIs
-import { AuthAPI } from '@/apis';
 
 // Utils
 import { UserValidator } from '@/utils/validator';
@@ -147,7 +147,7 @@ export default function SignUp() {
       setLoading(true);
 
       if (Object.values(validations).every((v) => v.error === false)) {
-        const { data } = await AuthAPI.post('/signup', {
+        const { data } = await api.post('/auth/signup', {
           name: formData.name,
           email: formData.email,
           password: formData.password,
@@ -159,26 +159,14 @@ export default function SignUp() {
           variant: 'success',
         });
 
-        router.push('/app');
-      } else {
-        // handle here
+        await router.push('/app');
       }
     } catch (err) {
       setLoading(false);
 
       if (err.response) {
-        switch (err.response.status) {
-          case 400:
-            if (err.response.data.vallidations) {
-              setValidations(err.response.data.vallidations);
-            }
-            break;
-
-          default:
-            enqueueSnackbar(err.response.data.message, {
-              variant: 'error',
-            });
-            break;
+        if (err.response.data.vallidations) {
+          setValidations(err.response.data.vallidations);
         }
       }
     }
@@ -190,7 +178,7 @@ export default function SignUp() {
     try {
       setLoading(true);
 
-      const { data } = await AuthAPI.post('/google', {
+      const { data } = await api.post('/auth/google', {
         googleIdToken: (response as GoogleLoginResponse).tokenId,
       });
 
@@ -200,17 +188,11 @@ export default function SignUp() {
         variant: 'success',
       });
 
-      router.push('/app');
-
       setLoading(false);
+
+      await router.push('/app');
     } catch (err) {
       setLoading(false);
-
-      if (err.response) {
-        enqueueSnackbar(err.response.data.message, {
-          variant: 'error',
-        });
-      }
     }
   };
 
@@ -255,7 +237,7 @@ export default function SignUp() {
           <Grid item>
             <GoogleLogin
               className={classes.googleButton}
-              clientId={GOOGLE_OAUTH_CLIENT_ID}
+              clientId={GOOGLE_OAUTH_WEB_CLIENT_ID}
               buttonText={`Continue with Google`}
               onSuccess={googleSignInOnSuccess}
               onFailure={googleSignInOnFailure}

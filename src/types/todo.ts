@@ -3,7 +3,7 @@ import { Moment } from 'moment';
 // Types
 import { Validation } from './';
 
-export interface ITodo {
+export interface Todo {
   _id: string;
   listId: string;
   name: string;
@@ -16,14 +16,14 @@ export interface ITodo {
   priority: string;
 }
 
-export interface ITodoFormValidations {
+export interface TodoFormValidations {
   name: Validation;
   notes: Validation;
   url: Validation;
   due: Validation;
 }
 
-export interface ITodoFormData {
+export interface TodoFormData {
   listId: string;
   name: string;
   notes: string | null;

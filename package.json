@@ -15,12 +15,12 @@
     }
   ],
   "scripts": {
-    "dev": "next -p 8000",
+    "dev": "next -p 8010",
     "build": "next build",
-    "start": "next start -p $WEB_PORT",
+    "start": "next start -p $PORT",
     "push": "npm-run-all docker:dev docker:latest",
-    "docker:dev": "git checkout dev && docker build -f Dev.Dockerfile -t sundayexplore/fancy-todo-web:dev . && docker push sundayexplore/fancy-todo-web:dev && git push origin dev",
-    "docker:latest": "git checkout master && git merge dev && docker build -f Prod.Dockerfile -t sundayexplore/fancy-todo-web:latest . && docker push sundayexplore/fancy-todo-web:latest && git push origin master && git checkout dev"
+    "docker:dev": "git checkout dev && docker build -f Dev.Dockerfile -t sundayx/fancy-todo-web:dev . && docker push sundayx/fancy-todo-web:dev && git push origin dev",
+    "docker:latest": "git checkout master && git merge dev && docker build -f Prod.Dockerfile -t sundayx/fancy-todo-web:latest . && docker push sundayx/fancy-todo-web:latest && git push origin master && git checkout dev"
   },
   "dependencies": {
     "@date-io/moment": "2.10.11",

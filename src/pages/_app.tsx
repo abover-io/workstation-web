@@ -5,7 +5,6 @@ import NextApp, {
   AppProps as NextAppProps,
   AppContext as NextAppContext,
 } from 'next/app';
-import { useRouter } from 'next/router';
 import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
@@ -13,22 +12,19 @@ import MomentUtils from '@date-io/moment';
 import cookie from 'cookie';
 import { SnackbarProvider } from 'notistack';
 
+// API
+import api from '@/api';
+
 // Types
 import { CookieMessage } from '@/types';
-
-// Components
-import { Loading } from '@/components';
 
 // Redux
 import reduxStore from '@/redux';
 import { setUser } from '@/redux/actions/auth';
+import { setLists } from '@/redux/actions/list';
 
 // Styles
-import '@/styles/global.scss';
 import { muiTheme } from '@/styles';
-
-// APIs
-import { AuthAPI } from '@/apis';
 
 interface AppProps extends NextAppProps {
   authenticated: boolean;
@@ -37,22 +33,19 @@ interface AppProps extends NextAppProps {
 interface AppContext extends NextAppContext {}
 
 export default function App({ authenticated, pageProps, Component }: AppProps) {
-  const router = useRouter();
-
   const checkAuth = useCallback(async () => {
     try {
       if (authenticated && reduxStore.getState().auth.user === null) {
-        const { data } = await AuthAPI.get('/sync');
-        reduxStore.dispatch(setUser(data.user));
+        const {
+          data: { user },
+        } = await api.get('/auth/sync');
+        const {
+          data: { lists },
+        } = await api.get('/lists');
+        reduxStore.dispatch(setUser(user));
+        reduxStore.dispatch(setLists(lists));
       }
-    } catch (err) {
-      if (err.response) {
-        if (err.response.status === 401) {
-          await AuthAPI.post('/signout');
-          await router.replace('/signin');
-        }
-      }
-    }
+    } catch (err) {}
   }, [authenticated]);
 
   useEffect(() => {

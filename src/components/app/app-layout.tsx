@@ -8,14 +8,21 @@ import {
   Typography,
   CssBaseline,
   Avatar,
+  Drawer,
+  Menu,
+  IconButton,
 } from '@material-ui/core';
 import {
-  CalendarToday as CalendarTodayIcon,
-  Inbox as InboxIcon,
-  Event as EventIcon,
-  Flag as FlagIcon,
+  MenuOutlined,
+  CalendarTodayOutlined,
+  InboxOutlined,
+  EventOutlined,
+  FlagOutlined,
 } from '@material-ui/icons';
 import clsx from 'clsx';
+
+// Styles
+import { GlobalStyles } from '@/styles';
 
 // Components
 import { CustomHead } from '@/components';
@@ -25,117 +32,51 @@ import { TodoSummaryCard } from '@/components/todo';
 // Custom Hooks
 import { useAuth } from '@/hooks';
 
-type AppLayoutProps = {
+interface AppLayoutProps {
   title: string;
   children: ReactNode;
-};
+}
 
 const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
   const classes = useStyles();
-  const user = useAuth().user;
+  const { user } = useAuth();
 
   return (
-    user && (
-      <>
-        <CustomHead title={title} />
+    <>
+      <CustomHead title={title} />
+      <GlobalStyles />
+      {user && (
+        <>
+          <CssBaseline />
 
-        <CssBaseline />
+          <Grid container direction={`column`}>
+            <Grid item>
+              <AppBar position={`fixed`}>
+                <Toolbar>
+                  <IconButton edge={`start`}>
+                    <MenuOutlined />
+                  </IconButton>
 
-        <Grid container direction={`column`}>
-          <Grid item>
-            <AppBar position={`fixed`} variant={`outlined`}>
-              <Toolbar variant={`dense`}>
-                <Typography className={classes.headerTitle} variant={`h6`}>
-                  Fancy Todo
-                </Typography>
+                  <Typography className={classes.headerTitle} variant={`h6`}>
+                    Fancy Todo
+                  </Typography>
 
-                <UserHeaderMenu />
-              </Toolbar>
-            </AppBar>
-          </Grid>
-
-          <Grid item>
-            <Toolbar variant={`regular`} />
-          </Grid>
-
-          <Grid
-            item
-            container
-            className={classes.summaryWrapper}
-            direction={`row`}
-            wrap={`nowrap`}
-          >
-            <Grid
-              item
-              container
-              direction={`column`}
-              justify={`space-evenly`}
-              alignItems={`stretch`}
-            >
-              <Grid item>
-                <TodoSummaryCard
-                  title={`Today`}
-                  total={100}
-                  icon={
-                    <Avatar className={clsx(classes.circle, classes.blue)}>
-                      <CalendarTodayIcon fontSize={`small`} />
-                    </Avatar>
-                  }
-                />
-              </Grid>
-
-              <Grid item>
-                <TodoSummaryCard
-                  title={`All`}
-                  total={100}
-                  icon={
-                    <Avatar className={clsx(classes.circle, classes.grey)}>
-                      <InboxIcon fontSize={`small`} />
-                    </Avatar>
-                  }
-                />
-              </Grid>
+                  <UserHeaderMenu />
+                </Toolbar>
+              </AppBar>
             </Grid>
 
-            <Grid
-              item
-              container
-              direction={`column`}
-              justify={`space-evenly`}
-              alignItems={`stretch`}
-            >
-              <Grid item>
-                <TodoSummaryCard
-                  title={`Scheduled`}
-                  total={100}
-                  icon={
-                    <Avatar className={clsx(classes.circle, classes.red)}>
-                      <EventIcon fontSize={`small`} />
-                    </Avatar>
-                  }
-                />
-              </Grid>
+            <Grid item>
+              <Toolbar />
+            </Grid>
 
-              <Grid item>
-                <TodoSummaryCard
-                  title={`Prioritized`}
-                  total={100}
-                  icon={
-                    <Avatar className={clsx(classes.circle, classes.orange)}>
-                      <FlagIcon fontSize={`small`} />
-                    </Avatar>
-                  }
-                />
-              </Grid>
+            <Grid item className={classes.main}>
+              {children}
             </Grid>
           </Grid>
-
-          <Grid item className={classes.main}>
-            {children}
-          </Grid>
-        </Grid>
-      </>
-    )
+        </>
+      )}
+    </>
   );
 };
 
@@ -173,7 +114,7 @@ const useStyles = makeStyles((theme) =>
       },
     },
     main: {
-      padding: theme.spacing(0, 2),
+      padding: theme.spacing(4),
     },
     circle: {
       width: theme.spacing(4.5),
