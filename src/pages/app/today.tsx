@@ -1,28 +1,29 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NextPage } from 'next';
+import { useDispatch } from 'react-redux';
 import { Grid, Typography, Divider } from '@material-ui/core';
 import moment from 'moment';
-import update from 'immutability-helper';
 
 // API
 import api from '@/api';
 
-// Types
-import { Todo } from '@/types/todo';
-
 // HOCs
 import { withAuth } from '@/hocs';
+
+// Custom Hooks
+import { useTodo } from '@/hooks';
 
 // Components
 import { AppLayout } from '@/components/app';
 import { AddTodoForm } from '@/components/todo';
 
 // Redux Actions
+import { setTotalTodos, setTodos } from '@/redux/actions/todo';
 
 const Today: NextPage = () => {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState<boolean>(false);
-  const [total, setTotal] = useState<number>(0);
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const { total, todos } = useTodo();
 
   const fetchTodos = useCallback(async () => {
     try {
@@ -34,8 +35,8 @@ const Today: NextPage = () => {
         },
       });
 
-      setTotal(data.total);
-      setTodos(data.todos);
+      dispatch(setTotalTodos(data.total));
+      dispatch(setTodos(data.todos));
 
       setLoading(false);
     } catch (err) {
@@ -46,14 +47,6 @@ const Today: NextPage = () => {
   useEffect(() => {
     fetchTodos();
   }, []);
-
-  const handleFinishAddTodo = (todo: Todo) => {
-    setTodos(
-      update(todos, {
-        $push: [todo],
-      }),
-    );
-  };
 
   return (
     <AppLayout title={`Today`}>
@@ -84,7 +77,7 @@ const Today: NextPage = () => {
           ))}
 
           <Grid item>
-            <AddTodoForm onFinish={handleFinishAddTodo} />
+            <AddTodoForm />
           </Grid>
         </Grid>
       </Grid>

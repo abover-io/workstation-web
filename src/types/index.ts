@@ -15,3 +15,8 @@ export type Validation = {
   error: boolean;
   text: string;
 };
+
+export interface Option<T = string, U = any> {
+  label: T;
+  value: U;
+}

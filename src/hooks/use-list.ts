@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 
 // Types
-import { IRootState, IListReducer } from '@/types/redux';
+import { RootState, ListReducer } from '@/types/redux';
 
-export default function useList(): IListReducer {
-  return useSelector((state: IRootState) => state.list);
+export default function useList(): ListReducer {
+  return useSelector((state: RootState) => state.list);
 }

@@ -1,10 +1,13 @@
 // Types
-import { IAction } from '@/types/redux';
-import { IUser } from '@/types/auth';
+import { Action } from '@/types/redux';
+import { User } from '@/types/auth';
 
-export function setUser(user: IUser | null): IAction<IUser | null> {
+// Constants
+import { SET_USER } from '@/constants/redux/auth';
+
+export function setUser(user: User | null): Action<User | null> {
   return {
-    type: 'SET_USER',
+    type: SET_USER,
     payload: user,
   };
 }

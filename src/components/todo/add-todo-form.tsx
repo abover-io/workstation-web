@@ -1,7 +1,17 @@
 import { FC, useState, FormEvent } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-import { Grid, Button, TextField } from '@material-ui/core';
-import { AddOutlined } from '@material-ui/icons';
+import {
+  Grid,
+  Button,
+  FormControl,
+  TextField,
+  Select,
+  SelectProps,
+  MenuItem,
+  ListItemIcon,
+  Typography,
+} from '@material-ui/core';
+import { AddOutlined, FlagOutlined } from '@material-ui/icons';
 
 // API
 import api from '@/api';
@@ -9,13 +19,13 @@ import api from '@/api';
 // Types
 import { Todo } from '@/types/todo';
 
-interface AddTodoFormProps {
-  onFinish: (todo: Todo) => void;
-}
+// Constants
+import { TodoPriorities } from '@/constants/todo';
 
-const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
+const AddTodoForm: FC<{}> = () => {
   const classes = useStyles();
   const [open, setOpen] = useState<boolean>(false);
+  const [priorityOpen, setPriorityOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
     setOpen(true);
@@ -25,10 +35,21 @@ const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
     setOpen(false);
   };
 
+  const handleOpenPriority = () => {
+    setPriorityOpen(true);
+  };
+
+  const handleClosePriority = () => {
+    setPriorityOpen(false);
+  };
+
+  const handleChangePriority: SelectProps['onChange'] = (e) => {
+    console.log(e.target.value);
+  };
+
   const handleAddTodo = async (e: FormEvent) => {
     try {
       e.preventDefault();
-      onFinish({} as Todo);
     } catch (err) {}
   };
 
@@ -54,6 +75,29 @@ const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
         >
           <Grid item>
             <TextField fullWidth variant={`outlined`} multiline />
+          </Grid>
+
+          <Grid item container justify={`space-evenly`}>
+            <Grid item>
+              <Select
+                open={priorityOpen}
+                onClose={handleClosePriority}
+                onOpen={handleOpenPriority}
+                defaultValue={TodoPriorities[0].value}
+                onChange={handleChangePriority}
+              >
+                {TodoPriorities.map((priority) => (
+                  <MenuItem key={priority.value} value={priority.value}>
+                    <ListItemIcon style={{ color: priority.color }}>
+                      <FlagOutlined color={`inherit`} />
+                    </ListItemIcon>
+                    <Typography variant={`inherit`}>
+                      {priority.label}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
           </Grid>
 
           <Grid item container justify={`flex-end`} spacing={1}>

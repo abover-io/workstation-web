@@ -1,20 +1,29 @@
-import { IUser } from './auth';
-import { IList } from './list';
+// Types
+import { User } from './auth';
+import { List } from './list';
+import { Todo } from './todo';
 
-export interface IAction<T = any> {
+export interface Action<T = any> {
   type: string;
   payload: T;
 }
 
-export interface IRootState {
-  auth: IAuthReducer;
-  list: IListReducer;
+export interface RootState {
+  auth: AuthReducer;
+  list: ListReducer;
+  todo: TodoReducer;
 }
 
-export interface IAuthReducer {
-  user: IUser | null;
+export interface AuthReducer {
+  user: User | null;
 }
 
-export interface IListReducer {
-  list: IList[];
+export interface ListReducer {
+  total: number;
+  lists: List[];
+}
+
+export interface TodoReducer {
+  total: number;
+  todos: Todo[];
 }

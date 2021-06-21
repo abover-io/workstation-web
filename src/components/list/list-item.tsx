@@ -14,13 +14,13 @@ import {
 } from '@material-ui/icons';
 
 // Types
-import { IList } from '@/types/list';
+import { List } from '@/types/list';
 
-export interface IListItemProps {
-  list: IList;
+export interface ListItemProps {
+  list: List;
 }
 
-const ListItem: FC<IListItemProps> = ({ list }: IListItemProps) => {
+const ListItem: FC<ListItemProps> = ({ list }: ListItemProps) => {
   const classes = useStyles();
   const router = useRouter();
 

@@ -1,7 +1,8 @@
 import { Moment } from 'moment';
+import { colors } from '@material-ui/core';
 
 // Types
-import { Validation } from './';
+import { Validation, Option } from './';
 
 export interface Todo {
   _id: string;
@@ -14,6 +15,17 @@ export interface Todo {
   due: Date | Moment | string | null;
   completed: boolean;
   priority: string;
+}
+
+export enum TodoPriority {
+  NONE = 'none',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}
+
+export interface TodoPriorityOption extends Option {
+  color?: string;
 }
 
 export interface TodoFormValidations {

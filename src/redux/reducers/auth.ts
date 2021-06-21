@@ -1,16 +1,16 @@
 import update from 'immutability-helper';
 
 // Types
-import { IAction, IAuthReducer } from '@/types/redux';
+import { Action, AuthReducer } from '@/types/redux';
 
-const initialState: IAuthReducer = {
+const initialState: AuthReducer = {
   user: null,
 };
 
 export default function authReducer(
   state = initialState,
-  action: IAction,
-): IAuthReducer {
+  action: Action,
+): AuthReducer {
   switch (action.type) {
     case 'SET_USER':
       return update(state, {
