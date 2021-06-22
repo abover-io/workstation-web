@@ -34,7 +34,7 @@ import { CookieMessage } from '@/types';
 // Redux
 import reduxStore from '@/redux';
 import { setUser } from '@/redux/actions/auth';
-import { setLists } from '@/redux/actions/list';
+import { setTotalLists, setLists } from '@/redux/actions/list';
 
 // Styles
 import { muiTheme } from '@/styles';
@@ -53,9 +53,10 @@ export default function App({ authenticated, pageProps, Component }: AppProps) {
           data: { user },
         } = await api.get('/auth/sync');
         const {
-          data: { lists },
+          data: { total: totalLists, lists },
         } = await api.get('/lists');
         reduxStore.dispatch(setUser(user));
+        reduxStore.dispatch(setTotalLists(totalLists));
         reduxStore.dispatch(setLists(lists));
       }
     } catch (err) {}
