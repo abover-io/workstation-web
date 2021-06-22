@@ -1,35 +1,52 @@
 import update from 'immutability-helper';
 
 // Types
-import { IAction, IListReducer } from '@/types/redux';
-import { IList } from '@/types/list';
+import { Action, ListReducer } from '@/types/redux';
+import { List } from '@/types/list';
 
-const initialState: IListReducer = {
-  list: [] as IList[],
+// Constants
+import {
+  SET_TOTAL_LISTS,
+  SET_LISTS,
+  ADD_LIST,
+  UPDATE_LIST,
+  DELETE_LIST,
+} from '@/constants/redux/list';
+
+const initialState: ListReducer = {
+  total: 0,
+  lists: [] as List[],
 };
 
 export default function listReducer(
   state = initialState,
-  action: IAction,
-): IListReducer {
+  action: Action,
+): ListReducer {
   switch (action.type) {
-    case 'SET_LISTS':
+    case SET_TOTAL_LISTS:
       return update(state, {
-        list: {
+        total: {
           $set: action.payload,
         },
       });
 
-    case 'ADD_LIST':
+    case SET_LISTS:
       return update(state, {
-        list: {
+        lists: {
+          $set: action.payload,
+        },
+      });
+
+    case ADD_LIST:
+      return update(state, {
+        lists: {
           $push: action.payload,
         },
       });
 
-    case 'UPDATE_LIST':
-      const updatedList: IList = action.payload;
-      const newLists: IList[] = state.list.map((list) => {
+    case UPDATE_LIST:
+      const updatedList: List = action.payload;
+      const newLists: List[] = state.lists.map((list) => {
         if (list._id === updatedList._id) {
           return updatedList;
         }
@@ -37,15 +54,15 @@ export default function listReducer(
         return list;
       });
       return update(state, {
-        list: {
+        lists: {
           $set: newLists,
         },
       });
 
-    case 'DELETE_LIST':
+    case DELETE_LIST:
       return update(state, {
-        list: {
-          $set: state.list.filter((list) => list._id !== action.payload),
+        lists: {
+          $set: state.lists.filter((list) => list._id !== action.payload),
         },
       });
 

@@ -12,7 +12,7 @@ export default function withAuth<CP, IP>(
     WrappedComponent,
     location,
     clientCondition: function withAuthClientCondition(): boolean {
-      return !cookie.parse(document.cookie)['_csrf'];
+      return !cookie.parse(document.cookie)['_xsrf'];
     },
     serverCondition: function withAuthServerCondition(ctx): boolean {
       return !ctx.req?.cookies['act'];

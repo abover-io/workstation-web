@@ -1,20 +1,13 @@
-import { useRouter } from 'next/router';
-import React, { useEffect, FC } from 'react';
+import React from 'react';
 
-import { Layout, Loading } from '@/components';
+import { Layout } from '@/components';
 
-const Index: FC<{}> = () => {
-  const router = useRouter();
+export interface IHomeProps {}
 
-  useEffect(() => {
-    router.replace('/home');
-  }, []);
-
+export default function Home({}: IHomeProps) {
   return (
     <Layout>
-      <Loading />
+      <h1>THIS IS HOME</h1>
     </Layout>
   );
-};
-
-export default Index;
+}

@@ -3,12 +3,12 @@ import React, { FC, ReactNode } from 'react';
 // Components
 import CustomHead from './custom-head';
 
-type AppLayoutProps = {
+interface LayoutProps {
   title?: string;
   children: ReactNode;
-};
+}
 
-const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
+const Layout: FC<LayoutProps> = ({ title, children }) => {
   return (
     <>
       <CustomHead title={title} />
@@ -22,4 +22,4 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
   );
 };
 
-export default AppLayout;
+export default Layout;

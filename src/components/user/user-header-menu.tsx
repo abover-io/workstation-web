@@ -9,8 +9,8 @@ import {
 } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 
-// APIs
-import { UserAPI } from '@/apis';
+// API
+import api from '@/api';
 
 // Custom Hooks
 import { useAuth } from '@/hooks';
@@ -31,25 +31,13 @@ const UserHeaderMenu: FC<{}> = () => {
 
   const handleSignOut = async (): Promise<void> => {
     try {
-      const { data } = await UserAPI.post('/signout');
+      const { data } = await api.post('/auth/signout');
       localStorage.clear();
       enqueueSnackbar(data.message, {
         variant: 'success',
       });
       await router.push('/signin');
-    } catch (err) {
-      if (err.response) {
-        if (err.response.data) {
-          enqueueSnackbar(err.response.data.message, {
-            variant: 'error',
-          });
-        } else {
-          enqueueSnackbar('Unknown error has occured!', {
-            variant: 'error',
-          });
-        }
-      }
-    }
+    } catch (err) {}
   };
 
   return (

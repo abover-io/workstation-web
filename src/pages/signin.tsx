@@ -1,4 +1,11 @@
-import React, { FC, useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
+import React, {
+  FC,
+  useState,
+  useEffect,
+  FormEvent,
+  MouseEvent,
+  ChangeEvent,
+} from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
@@ -27,8 +34,11 @@ import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 import update from 'immutability-helper';
 
+// API
+import api from '@/api';
+
 // Config
-import { GOOGLE_OAUTH_CLIENT_ID } from '@/config';
+import { GOOGLE_OAUTH_WEB_CLIENT_ID } from '@/config';
 
 // Types
 import { ISignInFormValidations, ISignInFormData } from '@/types/auth';
@@ -38,9 +48,6 @@ import { withoutAuth } from '@/hocs';
 
 // Components
 import { Layout } from '@/components';
-
-// APIs
-import { AuthAPI } from '@/apis';
 
 // Utils
 import { UserValidator } from '@/utils/validator';
@@ -126,7 +133,7 @@ const SignIn: FC<{}> = () => {
       setLoading(true);
 
       if (Object.values(validations).every((v) => v.error === false)) {
-        const { data } = await AuthAPI.post('/signin', {
+        const { data } = await api.post('/auth/signin', {
           email: formData.email,
           password: formData.password,
         });
@@ -138,8 +145,6 @@ const SignIn: FC<{}> = () => {
         });
 
         router.push('/app');
-      } else {
-        // handle here
       }
 
       setLoading(false);
@@ -147,18 +152,8 @@ const SignIn: FC<{}> = () => {
       setLoading(false);
 
       if (err.response) {
-        switch (err.response.status) {
-          case 400:
-            if (err.response.data.vallidations) {
-              setValidations(err.response.data.vallidations);
-            }
-            break;
-
-          default:
-            enqueueSnackbar(err.response.data.message, {
-              variant: 'error',
-            });
-            break;
+        if (err.response.data.vallidations) {
+          setValidations(err.response.data.vallidations);
         }
       }
     }
@@ -170,7 +165,7 @@ const SignIn: FC<{}> = () => {
     try {
       setLoading(true);
 
-      const { data } = await AuthAPI.post('/google', {
+      const { data } = await api.post('/auth/google', {
         googleIdToken: (response as GoogleLoginResponse).tokenId,
       });
 
@@ -180,17 +175,11 @@ const SignIn: FC<{}> = () => {
         variant: 'success',
       });
 
-      router.push('/app');
-
       setLoading(false);
+
+      await router.push('/app');
     } catch (err) {
       setLoading(false);
-
-      if (err.response) {
-        enqueueSnackbar(err.response.data.message, {
-          variant: 'error',
-        });
-      }
     }
   };
 
@@ -217,12 +206,11 @@ const SignIn: FC<{}> = () => {
         <Grid item>
           <GoogleLogin
             className={classes.googleButton}
-            clientId={GOOGLE_OAUTH_CLIENT_ID}
+            clientId={GOOGLE_OAUTH_WEB_CLIENT_ID}
             buttonText={`Continue with Google`}
             onSuccess={googleSignInOnSuccess}
             onFailure={googleSignInOnFailure}
             cookiePolicy={`single_host_origin`}
-            isSignedIn
             render={(renderProps) => (
               <GoogleLoginButton
                 onClick={renderProps.onClick}
