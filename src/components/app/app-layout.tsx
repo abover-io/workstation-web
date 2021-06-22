@@ -19,7 +19,6 @@ import {
   EventOutlined,
   FlagOutlined,
 } from '@material-ui/icons';
-import clsx from 'clsx';
 
 // Styles
 import { GlobalStyles } from '@/styles';
@@ -53,12 +52,12 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
             <Grid item>
               <AppBar position={`fixed`}>
                 <Toolbar>
-                  <IconButton edge={`start`}>
+                  <IconButton edge={`start`} color={`inherit`}>
                     <MenuOutlined />
                   </IconButton>
 
                   <Typography className={classes.headerTitle} variant={`h6`}>
-                    Fancy Todo
+                    {`Fancy Todo`}
                   </Typography>
 
                   <UserHeaderMenu />

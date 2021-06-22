@@ -3,7 +3,7 @@ import { colors } from '@material-ui/core';
 // Types
 import { TodoPriority, TodoPriorityOption } from '@/types/todo';
 
-export const TodoPriorities: TodoPriorityOption[] = [
+export const TodoPriorityOptions: TodoPriorityOption[] = [
   {
     label: 'None',
     value: TodoPriority.NONE,

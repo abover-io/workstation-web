@@ -9,8 +9,21 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
+import moment from 'moment';
 import cookie from 'cookie';
 import { SnackbarProvider } from 'notistack';
+
+// Moment Locale Config
+moment.updateLocale('en', {
+  calendar: {
+    lastDay: '[Yesterday]',
+    sameDay: '[Today]',
+    nextDay: '[Tomorrow]',
+    lastWeek: '[Last] dddd',
+    nextWeek: '[Next] dddd',
+    sameElse: 'MMM D',
+  },
+});
 
 // API
 import api from '@/api';
