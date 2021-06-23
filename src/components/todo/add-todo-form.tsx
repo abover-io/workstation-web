@@ -2,9 +2,11 @@ import { FC, useState, FormEvent, MouseEvent } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   Grid,
-  IconButton,
+  ButtonGroup,
   Button,
+  IconButton,
   TextField,
+  TextFieldProps,
   List,
   ListItem,
   ListItemIcon,
@@ -19,6 +21,7 @@ import {
   FiberManualRecord as FiberManualRecordIcon,
   InboxOutlined,
   CalendarTodayOutlined,
+  ClearOutlined,
 } from '@material-ui/icons';
 import moment, { Moment } from 'moment';
 import update from 'immutability-helper';
@@ -27,10 +30,11 @@ import update from 'immutability-helper';
 import api from '@/api';
 
 // Types
+import { Validation } from '@/types';
 import { AddTodoFormValidation, AddTodoFormData } from '@/types/todo';
 
 // Constants
-import { TodoPriorityOptions } from '@/constants/todo';
+import { TodoPriorityOptions, TodoDueTimeFormats } from '@/constants/todo';
 
 // Custom Hooks
 import { useList } from '@/hooks';
@@ -42,12 +46,14 @@ const AddTodoForm: FC<{}> = () => {
   const classes = useStyles();
   const { lists } = useList();
   const [open, setOpen] = useState<boolean>(false);
-  const [dueAnchorEl, setDueAnchorEl] =
-    useState<HTMLButtonElement | null>(null);
+  const [dueAnchorEl, setDueAnchorEl] = useState<HTMLButtonElement | null>(
+    null,
+  );
   const [dueTimeAnchorEl, setDueTimeAnchorEl] =
     useState<HTMLButtonElement | null>(null);
-  const [listAnchorEl, setListAnchorEl] =
-    useState<HTMLButtonElement | null>(null);
+  const [listAnchorEl, setListAnchorEl] = useState<HTMLButtonElement | null>(
+    null,
+  );
   const [priorityAnchorEl, setPriorityAnchorEl] =
     useState<HTMLButtonElement | null>(null);
   const [validations, setValidations] = useState<AddTodoFormValidation>({
@@ -84,6 +90,12 @@ const AddTodoForm: FC<{}> = () => {
       text: '',
     },
   });
+  const [dueTimeValidation, setDueTimeValidation] = useState<Validation>({
+    error: false,
+    text: '',
+  });
+  const [dueTimeInput, setDueTimeInput] = useState<string>('');
+  const [dueTime, setDueTime] = useState<Moment | null>(null);
   const [formData, setFormData] = useState<AddTodoFormData>({
     list: null,
     name: '',
@@ -109,9 +121,20 @@ const AddTodoForm: FC<{}> = () => {
     setDueAnchorEl(null);
   };
   const handleOpenDueTime = (e: MouseEvent<HTMLButtonElement>) => {
+    if (formData.isTimeSet) {
+      setDueTimeInput((formData.due as Moment).format('hh:mm A'));
+      setDueTime(formData.due as Moment);
+    }
+
     setDueTimeAnchorEl(e.currentTarget);
   };
   const handleCloseDueTime = () => {
+    setDueTimeValidation({
+      error: false,
+      text: '',
+    });
+    setDueTimeInput('');
+    setDueTime(null);
     setDueTimeAnchorEl(null);
   };
 
@@ -129,6 +152,23 @@ const AddTodoForm: FC<{}> = () => {
     setPriorityAnchorEl(null);
   };
 
+  const handleChangeName: TextFieldProps['onChange'] = (e) => {
+    setValidations(
+      update(validations, {
+        name: {
+          $set: TodoValidator.Name(e.target.value),
+        },
+      }),
+    );
+
+    setFormData(
+      update(formData, {
+        name: {
+          $set: e.target.value,
+        },
+      }),
+    );
+  };
   const handleChangeDue: DatePickerProps['onChange'] = (due) => {
     setFormData(
       update(formData, {
@@ -138,6 +178,73 @@ const AddTodoForm: FC<{}> = () => {
       }),
     );
     setDueAnchorEl(null);
+  };
+  const handleChangeDueTime: TextFieldProps['onChange'] = (e) => {
+    setDueTimeInput(e.target.value);
+
+    const input: Moment = moment(e.target.value, TodoDueTimeFormats, true);
+
+    if (input.isValid()) {
+      setDueTimeValidation({
+        error: false,
+        text: '',
+      });
+
+      setDueTime(input);
+    } else {
+      setDueTimeValidation({
+        error: true,
+        text: 'Invalid time!',
+      });
+      setDueTime(null);
+    }
+  };
+  const handleSetDueTime = (e: FormEvent) => {
+    e.preventDefault();
+
+    if (dueTime !== null) {
+      setFormData(
+        update(formData, {
+          isDateSet: {
+            $set: true,
+          },
+          isTimeSet: {
+            $set: true,
+          },
+          due: {
+            $set:
+              formData.due === null
+                ? dueTime
+                : (formData.due as Moment).set({
+                    h: dueTime.get('h'),
+                    m: dueTime.get('m'),
+                  }),
+          },
+        }),
+      );
+      handleCloseDueTime();
+    }
+  };
+  const handleUnsetDueTime = () => {
+    setDueTimeValidation({
+      error: false,
+      text: '',
+    });
+    setDueTimeInput('');
+    setDueTime(null);
+    setFormData(
+      update(formData, {
+        isTimeSet: {
+          $set: false,
+        },
+        due: {
+          $set: (formData.due as Moment).set({
+            h: 0,
+            m: 0,
+          }),
+        },
+      }),
+    );
   };
 
   const handleChangeList = (list: AddTodoFormData['list']) => {
@@ -194,7 +301,11 @@ const AddTodoForm: FC<{}> = () => {
               fullWidth
               variant={`outlined`}
               multiline
+              required
               placeholder={`e.g. Study Calculus.`}
+              onChange={handleChangeName}
+              error={validations.name.error}
+              helperText={validations.name.text}
             />
           </Grid>
 
@@ -246,18 +357,22 @@ const AddTodoForm: FC<{}> = () => {
                   container
                   justify={`space-between`}
                 >
-                  {formData.isTimeSet ? (
+                  {!formData.isTimeSet ? (
                     <Button
                       variant={`text`}
                       startIcon={<AddOutlined />}
                       onClick={handleOpenDueTime}
                     >{`Add Time`}</Button>
                   ) : (
-                    <Button
-                      variant={`text`}
-                      startIcon={<AddOutlined />}
-                      onClick={handleOpenDueTime}
-                    >{`Add Time`}</Button>
+                    <ButtonGroup variant={`outlined`}>
+                      <Button onClick={handleOpenDueTime}>
+                        {(formData.due as Moment).format('hh:mm A')}
+                      </Button>
+
+                      <Button onClick={handleUnsetDueTime}>
+                        <ClearOutlined />
+                      </Button>
+                    </ButtonGroup>
                   )}
                 </Grid>
 
@@ -277,13 +392,23 @@ const AddTodoForm: FC<{}> = () => {
                     className: classes.timePaper,
                   }}
                 >
-                  <Grid container direction={`column`} spacing={1}>
+                  <Grid
+                    container
+                    component={`form`}
+                    direction={`column`}
+                    spacing={1}
+                    onSubmit={handleSetDueTime}
+                  >
                     <Grid item>
                       <TextField
                         fullWidth
                         size={`small`}
                         label={`Time`}
                         placeholder={`e.g. 10am`}
+                        value={dueTimeInput}
+                        onChange={handleChangeDueTime}
+                        error={dueTimeValidation.error}
+                        helperText={dueTimeValidation.text}
                       />
                     </Grid>
                     <Grid item container justify={`flex-end`} spacing={1}>
@@ -298,11 +423,10 @@ const AddTodoForm: FC<{}> = () => {
                       <Grid item>
                         <Button
                           variant={`contained`}
+                          type={`submit`}
                           color={`primary`}
                           size={`small`}
-                          disabled={Object.values(validations).some(
-                            (v) => v.error === true,
-                          )}
+                          disabled={dueTimeValidation.error || dueTime === null}
                         >{`Add`}</Button>
                       </Grid>
                     </Grid>

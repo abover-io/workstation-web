@@ -145,51 +145,6 @@ class TodoValidator implements TodoValidatorInterface {
     };
   }
 
-  public DueTime(input: string): Validation {
-    const result: string[] = input
-      .replace(/\'/g, '')
-      .split(/(\d+)/)
-      .filter(Boolean);
-
-    const validationError: Validation = {
-      error: true,
-      text: 'Invalid due time!',
-    };
-
-    if (result.length <= 0 || result.length > 2) {
-      return validationError;
-    }
-
-    let time: string | number = result[0];
-    let format = result[1];
-
-    if (isNaN(+time)) {
-      return validationError;
-    } else {
-      time = parseInt(time, 10);
-
-      if (time < 0 || time > 12) {
-        return validationError;
-      }
-    }
-
-    switch (format.toLowerCase()) {
-      case 'am':
-        break;
-
-      case 'pm':
-        break;
-
-      default:
-        return validationError;
-    }
-
-    return {
-      error: false,
-      text: '',
-    };
-  }
-
   public Priority(input: string): Validation {
     switch (input) {
       case TodoPriority.NONE:
