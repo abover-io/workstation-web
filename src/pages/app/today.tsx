@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { NextPage } from 'next';
 import { useDispatch } from 'react-redux';
 import { Grid, Typography, Divider } from '@material-ui/core';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 // API
 import api from '@/api';
@@ -15,10 +15,10 @@ import { useTodo } from '@/hooks';
 
 // Components
 import { AppLayout } from '@/components/app';
-import { AddTodoForm } from '@/components/todo';
+import AddTodoForm, { AddTodoFormProps } from '@/components/todo/add-todo-form';
 
 // Redux Actions
-import { setTotalTodos, setTodos } from '@/redux/actions/todo';
+import { setTotalTodos, setTodos, addTodo } from '@/redux/actions/todo';
 
 const Today: NextPage = () => {
   const dispatch = useDispatch();
@@ -47,6 +47,12 @@ const Today: NextPage = () => {
   useEffect(() => {
     fetchTodos();
   }, []);
+
+  const handleFinishAddTodo: AddTodoFormProps['onFinish'] = (todo) => {
+    if (todo.due === null || moment(todo.due).isSame(moment(), 'd')) {
+      dispatch(addTodo(todo));
+    }
+  };
 
   return (
     <AppLayout title={`Today`}>
@@ -77,7 +83,7 @@ const Today: NextPage = () => {
           ))}
 
           <Grid item>
-            <AddTodoForm />
+            <AddTodoForm onFinish={handleFinishAddTodo} />
           </Grid>
         </Grid>
       </Grid>
