@@ -4,7 +4,6 @@ import {
   Grid,
   ButtonGroup,
   Button,
-  IconButton,
   TextField,
   TextFieldProps,
   List,
@@ -23,6 +22,7 @@ import {
   CalendarTodayOutlined,
   ClearOutlined,
 } from '@material-ui/icons';
+import { useSnackbar } from 'notistack';
 import moment, { Moment } from 'moment';
 import update from 'immutability-helper';
 
@@ -31,7 +31,7 @@ import api from '@/api';
 
 // Types
 import { Validation } from '@/types';
-import { AddTodoFormValidation, AddTodoFormData } from '@/types/todo';
+import { Todo, AddTodoFormValidation, AddTodoFormData } from '@/types/todo';
 
 // Constants
 import { TodoPriorityOptions, TodoDueTimeFormats } from '@/constants/todo';
@@ -42,10 +42,16 @@ import { useList } from '@/hooks';
 // Utils
 import { TodoValidator } from '@/utils/validator';
 
-const AddTodoForm: FC<{}> = () => {
+export interface AddTodoFormProps {
+  onFinish: (todo: Todo) => Promise<void> | void;
+}
+
+const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const { lists } = useList();
   const [open, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [dueAnchorEl, setDueAnchorEl] = useState<HTMLButtonElement | null>(
     null,
   );
@@ -103,7 +109,11 @@ const AddTodoForm: FC<{}> = () => {
     url: null,
     isDateSet: true,
     isTimeSet: false,
-    due: moment(),
+    due: moment().set({
+      h: 0,
+      m: 0,
+      s: 0,
+    }),
     priority: TodoPriorityOptions[0],
   });
 
@@ -269,10 +279,103 @@ const AddTodoForm: FC<{}> = () => {
     setPriorityAnchorEl(null);
   };
 
+  const reset = () => {
+    setValidations({
+      listId: {
+        error: false,
+        text: '',
+      },
+      name: {
+        error: false,
+        text: '',
+      },
+      notes: {
+        error: false,
+        text: '',
+      },
+      url: {
+        error: false,
+        text: '',
+      },
+      isDateSet: {
+        error: false,
+        text: '',
+      },
+      isTimeSet: {
+        error: false,
+        text: '',
+      },
+      due: {
+        error: false,
+        text: '',
+      },
+      priority: {
+        error: false,
+        text: '',
+      },
+    });
+    setDueTimeValidation({
+      error: false,
+      text: '',
+    });
+    setDueTimeInput('');
+    setDueTime(null);
+    setFormData({
+      list: null,
+      name: '',
+      notes: null,
+      url: null,
+      isDateSet: true,
+      isTimeSet: false,
+      due: moment(),
+      priority: TodoPriorityOptions[0],
+    });
+  };
+
   const handleAddTodo = async (e: FormEvent) => {
     try {
       e.preventDefault();
-    } catch (err) {}
+
+      if (
+        Object.values(validations).every(
+          (validation) => validation.error === false,
+        )
+      ) {
+        setLoading(true);
+
+        const { data } = await api.post('/todos', {
+          listId: formData.list !== null ? formData.list._id : null,
+          name: formData.name,
+          notes: formData.notes,
+          url: formData.url,
+          isDateSet: formData.isDateSet,
+          isTimeSet: formData.isTimeSet,
+          due: formData.due,
+          priority: formData.priority.value,
+        });
+
+        enqueueSnackbar(data.message, {
+          variant: 'success',
+          persist: false,
+        });
+
+        reset();
+
+        setLoading(false);
+        setOpen(false);
+
+        onFinish(data.todo);
+      }
+    } catch (err) {
+      setLoading(false);
+
+      if (err.response) {
+        enqueueSnackbar(err.response.data.message, {
+          variant: 'error',
+          persist: false,
+        });
+      }
+    }
   };
 
   return (
@@ -281,6 +384,7 @@ const AddTodoForm: FC<{}> = () => {
         <Button
           fullWidth
           variant={`text`}
+          disabled={loading}
           startIcon={<AddOutlined />}
           onClick={handleOpen}
         >{`Add Todo`}</Button>
@@ -300,6 +404,7 @@ const AddTodoForm: FC<{}> = () => {
             <TextField
               fullWidth
               variant={`outlined`}
+              disabled={loading}
               multiline
               required
               placeholder={`e.g. Study Calculus.`}
@@ -321,6 +426,7 @@ const AddTodoForm: FC<{}> = () => {
             <Grid item>
               <Button
                 variant={`outlined`}
+                disabled={loading}
                 startIcon={<CalendarTodayOutlined />}
                 onClick={handleOpenDue}
               >
@@ -345,6 +451,7 @@ const AddTodoForm: FC<{}> = () => {
                   disableToolbar
                   disablePast
                   variant={`static`}
+                  disabled={loading}
                   openTo={`date`}
                   value={formData.due}
                   onChange={handleChangeDue}
@@ -360,11 +467,12 @@ const AddTodoForm: FC<{}> = () => {
                   {!formData.isTimeSet ? (
                     <Button
                       variant={`text`}
+                      disabled={loading}
                       startIcon={<AddOutlined />}
                       onClick={handleOpenDueTime}
                     >{`Add Time`}</Button>
                   ) : (
-                    <ButtonGroup variant={`outlined`}>
+                    <ButtonGroup variant={`outlined`} disabled={loading}>
                       <Button onClick={handleOpenDueTime}>
                         {(formData.due as Moment).format('hh:mm A')}
                       </Button>
@@ -402,6 +510,7 @@ const AddTodoForm: FC<{}> = () => {
                     <Grid item>
                       <TextField
                         fullWidth
+                        disabled={loading}
                         size={`small`}
                         label={`Time`}
                         placeholder={`e.g. 10am`}
@@ -415,6 +524,7 @@ const AddTodoForm: FC<{}> = () => {
                       <Grid item>
                         <Button
                           variant={`text`}
+                          disabled={loading}
                           size={`small`}
                           onClick={handleCloseDueTime}
                         >{`Cancel`}</Button>
@@ -426,7 +536,11 @@ const AddTodoForm: FC<{}> = () => {
                           type={`submit`}
                           color={`primary`}
                           size={`small`}
-                          disabled={dueTimeValidation.error || dueTime === null}
+                          disabled={
+                            loading ||
+                            dueTimeValidation.error ||
+                            dueTime === null
+                          }
                         >{`Add`}</Button>
                       </Grid>
                     </Grid>
@@ -438,6 +552,7 @@ const AddTodoForm: FC<{}> = () => {
             <Grid item>
               <Button
                 variant={`outlined`}
+                disabled={loading}
                 startIcon={
                   formData.list === null ? (
                     <InboxOutlined />
@@ -498,6 +613,7 @@ const AddTodoForm: FC<{}> = () => {
             <Grid item>
               <Button
                 variant={`outlined`}
+                disabled={loading}
                 onClick={handleOpenPriority}
                 style={{
                   color: formData.priority.color,
@@ -543,7 +659,11 @@ const AddTodoForm: FC<{}> = () => {
 
           <Grid item container justify={`flex-end`} spacing={1}>
             <Grid item>
-              <Button variant={`text`} onClick={handleClose}>{`Cancel`}</Button>
+              <Button
+                variant={`text`}
+                disabled={loading}
+                onClick={handleClose}
+              >{`Cancel`}</Button>
             </Grid>
 
             <Grid item>
@@ -551,9 +671,10 @@ const AddTodoForm: FC<{}> = () => {
                 type={`submit`}
                 variant={`contained`}
                 color={`primary`}
-                disabled={Object.values(validations).some(
-                  (v) => v.error === true,
-                )}
+                disabled={
+                  loading ||
+                  Object.values(validations).some((v) => v.error === true)
+                }
               >{`Add`}</Button>
             </Grid>
           </Grid>

@@ -39,6 +39,9 @@ export default function todoReducer(
 
     case ADD_TODO:
       return update(state, {
+        total: {
+          $set: state.total + 1,
+        },
         todos: {
           $push: [action.payload],
         },
