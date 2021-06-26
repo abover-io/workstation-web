@@ -6,6 +6,7 @@ import { List } from './list';
 
 export interface Todo {
   _id: string;
+  userId: string;
   listId: string | null;
   name: string;
   notes: string | null;

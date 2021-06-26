@@ -1,4 +1,4 @@
-import { FC, useState, FormEvent, MouseEvent } from 'react';
+import { FC, useState, FormEvent, MouseEvent, ReactNode } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   Grid,
@@ -37,20 +37,28 @@ import { Todo, AddTodoFormValidation, AddTodoFormData } from '@/types/todo';
 import { TodoPriorityOptions, TodoDueTimeFormats } from '@/constants/todo';
 
 // Custom Hooks
-import { useList } from '@/hooks';
+import { useAuth, useList } from '@/hooks';
 
 // Utils
 import { TodoValidator } from '@/utils/validator';
 
 export interface AddTodoFormProps {
+  open: boolean;
+  opener: ReactNode;
+  onClose: () => Promise<void> | void;
   onFinish: (todo: Todo) => Promise<void> | void;
 }
 
-const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
+const AddTodoForm: FC<AddTodoFormProps> = ({
+  open,
+  opener,
+  onClose,
+  onFinish,
+}) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
   const { lists } = useList();
-  const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [dueAnchorEl, setDueAnchorEl] = useState<HTMLButtonElement | null>(
     null,
@@ -116,13 +124,6 @@ const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
     }),
     priority: TodoPriorityOptions[0],
   });
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleOpenDue = (e: MouseEvent<HTMLButtonElement>) => {
     setDueAnchorEl(e.currentTarget);
@@ -344,6 +345,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
         setLoading(true);
 
         const { data } = await api.post('/todos', {
+          userId: user!._id,
           listId: formData.list !== null ? formData.list._id : null,
           name: formData.name,
           notes: formData.notes,
@@ -362,8 +364,8 @@ const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
         reset();
 
         setLoading(false);
-        setOpen(false);
 
+        onClose();
         onFinish(data.todo);
       }
     } catch (err) {
@@ -378,17 +380,14 @@ const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
     }
   };
 
+  const handleCancel = () => {
+    reset();
+    onClose();
+  };
+
   return (
     <>
-      {!open && (
-        <Button
-          fullWidth
-          variant={`text`}
-          disabled={loading}
-          startIcon={<AddOutlined />}
-          onClick={handleOpen}
-        >{`Add Todo`}</Button>
-      )}
+      {!open && opener}
 
       {open && (
         <Grid
@@ -662,7 +661,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({ onFinish }) => {
               <Button
                 variant={`text`}
                 disabled={loading}
-                onClick={handleClose}
+                onClick={handleCancel}
               >{`Cancel`}</Button>
             </Grid>
 

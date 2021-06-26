@@ -70,7 +70,7 @@ export default function App({ authenticated, pageProps, Component }: AppProps) {
     <ReduxProvider store={reduxStore}>
       <MuiThemeProvider theme={muiTheme}>
         <MuiPickersUtilsProvider utils={MomentUtils}>
-          <SnackbarProvider maxSnack={5}>
+          <SnackbarProvider maxSnack={1} autoHideDuration={3000}>
             <Component {...pageProps} />
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
