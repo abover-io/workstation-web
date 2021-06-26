@@ -9,6 +9,10 @@ type TodoItemProps = {
 };
 
 const TodoItem: FC<TodoItemProps> = ({ todo }) => {
+  console.log({
+    todo,
+  });
+
   return (
     <Grid container direction={`column`}>
       <Grid item container>
