@@ -1,13 +1,13 @@
-import React from 'react';
+import { FC } from 'react';
 
 import { Layout } from '@/components';
 
-export interface IHomeProps {}
-
-export default function Home({}: IHomeProps) {
+const Home: FC<{}> = () => {
   return (
     <Layout>
       <h1>THIS IS HOME</h1>
     </Layout>
   );
-}
+};
+
+export default Home;

@@ -1,4 +1,4 @@
-import React, { FC, useState, ReactNode } from 'react';
+import { FC, useState, ReactNode } from 'react';
 import { useRouter } from 'next/router';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
@@ -86,9 +86,10 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                     </IconButton>
                   )}
 
-                  <Typography className={classes.headerTitle} variant={`h6`}>
-                    {`Fancy Todo`}
-                  </Typography>
+                  <Typography
+                    variant={`h6`}
+                    style={{ flexGrow: 1 }}
+                  >{`Fancy Todo`}</Typography>
 
                   <UserHeaderMenu />
                 </Toolbar>
@@ -181,10 +182,6 @@ const useStyles = makeStyles((theme) =>
   createStyles({
     appBar: {
       zIndex: theme.zIndex.drawer + 101,
-    },
-    headerTitle: {
-      flexGrow: 1,
-      fontWeight: theme.typography.fontWeightBold,
     },
     drawerPaper: {
       width: '80%',
