@@ -3,7 +3,7 @@ import { Validation } from './';
 
 export interface List {
   _id: string;
-  email: string;
+  userId: string;
   name: string;
   color: string;
 }

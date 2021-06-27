@@ -1,26 +1,171 @@
-import React, { FC } from 'react';
-import { Grid, Typography, Divider } from '@material-ui/core';
+import { FC, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import {
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemSecondaryAction,
+  Checkbox,
+  CheckboxProps,
+  IconButton,
+  Button,
+  ButtonProps,
+  Grid,
+} from '@material-ui/core';
+import { EditOutlined, FlagOutlined } from '@material-ui/icons';
+import { useSnackbar } from 'notistack';
 
 // Types
 import { Todo } from '@/types/todo';
 
-type TodoItemProps = {
+// API
+import api from '@/api';
+
+// Constants
+import { TodoPriorityOptions } from '@/constants/todo';
+
+// Redux Actions
+import { addTodo, updateTodo, deleteTodo } from '@/redux/actions/todo';
+
+// Components
+import UpdateTodoForm, { UpdateTodoFormProps } from './update-todo-form';
+
+interface TodoItemProps {
   todo: Todo;
-};
+}
 
 const TodoItem: FC<TodoItemProps> = ({ todo }) => {
-  return (
-    <Grid container direction={`column`}>
-      <Grid item container>
-        <Grid item>
-          <Typography>{todo.name}</Typography>
-        </Grid>
-      </Grid>
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showActions, setShowActions] = useState<boolean>(false);
+  const [openUpdate, setOpenUpdate] = useState<boolean>(false);
 
-      <Grid item>
-        <Divider orientation={`horizontal`} flexItem />
-      </Grid>
-    </Grid>
+  const handleMouseEnter = () => {
+    setShowActions(true);
+  };
+  const handleMouseLeave = () => {
+    setShowActions(false);
+  };
+
+  const handleOpenUpdateForm = () => {
+    setOpenUpdate(true);
+  };
+  const handleCloseUpdateForm = () => {
+    setOpenUpdate(false);
+  };
+
+  const handleUncompleteTodo: ButtonProps['onClick'] = async () => {
+    try {
+      setLoading(true);
+
+      const { data } = await api.patch(`/todos/uncomplete/${todo._id}`);
+
+      dispatch(addTodo(data.todo));
+
+      setLoading(false);
+
+      enqueueSnackbar(data.message, {
+        variant: 'success',
+        persist: false,
+      });
+    } catch (err) {
+      setLoading(false);
+
+      if (err.response) {
+        enqueueSnackbar(err.response.data.message, {
+          variant: 'error',
+          persist: false,
+        });
+      }
+    }
+  };
+
+  const handleCompleteTodo: CheckboxProps['onChange'] = async (e) => {
+    try {
+      if (e.target.checked) {
+        setLoading(true);
+
+        const { data } = await api.patch(`/todos/complete/${todo._id}`);
+
+        setLoading(false);
+
+        enqueueSnackbar(data.message, {
+          variant: 'success',
+          persist: false,
+          action: () => (
+            <Button
+              variant={`text`}
+              color={`inherit`}
+              onClick={handleUncompleteTodo}
+            >
+              {`Undo`}
+            </Button>
+          ),
+        });
+
+        dispatch(deleteTodo(todo._id));
+      }
+    } catch (err) {
+      setLoading(false);
+
+      if (err.response) {
+        enqueueSnackbar(err.response.data.message, {
+          variant: 'error',
+          persist: false,
+        });
+      }
+    }
+  };
+
+  const handleFinishUpdate: UpdateTodoFormProps['onFinish'] = (todo) => {
+    dispatch(updateTodo(todo));
+  };
+
+  const priority = TodoPriorityOptions.filter(
+    (p) => p.value === todo.priority,
+  )[0];
+
+  return (
+    <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <ListItem disableGutters divider disabled={loading}>
+        {!openUpdate && (
+          <>
+            <ListItemIcon>
+              <Checkbox
+                color={`primary`}
+                edge={`start`}
+                checked={todo.completed}
+                tabIndex={-1}
+                inputProps={{ 'aria-labelledby': todo._id }}
+                onChange={handleCompleteTodo}
+              />
+            </ListItemIcon>
+
+            <ListItemText id={todo._id} primary={todo.name} />
+
+            {showActions && (
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge={`end`}
+                  aria-label={`update-todo`}
+                  onClick={handleOpenUpdateForm}
+                >
+                  <EditOutlined />
+                </IconButton>
+              </ListItemSecondaryAction>
+            )}
+          </>
+        )}
+
+        <UpdateTodoForm
+          todo={todo}
+          open={openUpdate}
+          onClose={handleCloseUpdateForm}
+          onFinish={handleFinishUpdate}
+        />
+      </ListItem>
+    </div>
   );
 };
 

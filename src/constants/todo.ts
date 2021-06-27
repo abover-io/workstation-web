@@ -24,3 +24,26 @@ export const TodoPriorityOptions: TodoPriorityOption[] = [
     color: colors.red[500],
   },
 ];
+
+export const TodoDueTimeFormats: string[] = [
+  'ha',
+  'hha',
+  'hA',
+  'HHA',
+  'h a',
+  'hh a',
+  'h A',
+  'HH A',
+  'h:ma',
+  'hh:ma',
+  'hh:mma',
+  'h:mA',
+  'hh:mA',
+  'hh:mmA',
+  'h:m a',
+  'hh:m a',
+  'hh:mm a',
+  'h:m A',
+  'hh:m A',
+  'hh:mm A',
+];
