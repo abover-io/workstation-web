@@ -12,7 +12,7 @@ import {
   ButtonProps,
   Grid,
 } from '@material-ui/core';
-import { EditOutlined, FlagOutlined } from '@material-ui/icons';
+import { EditOutlined } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 
 // Types
@@ -29,6 +29,9 @@ import { addTodo, updateTodo, deleteTodo } from '@/redux/actions/todo';
 
 // Components
 import UpdateTodoForm, { UpdateTodoFormProps } from './update-todo-form';
+import TodoPriorityPicker, {
+  TodoPriorityPickerProps,
+} from './todo-priority-picker';
 
 interface TodoItemProps {
   todo: Todo;
@@ -121,6 +124,10 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
   const handleFinishUpdate: UpdateTodoFormProps['onFinish'] = (todo) => {
     dispatch(updateTodo(todo));
   };
+  const handleFinishUpdatePriority: TodoPriorityPickerProps['onFinishUpdatePriority'] =
+    (todo) => {
+      dispatch(updateTodo(todo));
+    };
 
   const priority = TodoPriorityOptions.filter(
     (p) => p.value === todo.priority,
@@ -146,6 +153,11 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
 
             {showActions && (
               <ListItemSecondaryAction>
+                <TodoPriorityPicker
+                  todo={todo}
+                  onFinishUpdatePriority={handleFinishUpdatePriority}
+                />
+
                 <IconButton
                   edge={`end`}
                   aria-label={`update-todo`}
