@@ -53,10 +53,14 @@ export interface AddTodoFormValidation {
 }
 
 export interface UpdateTodoFormValidation {
+  listId: Validation;
   name: Validation;
   notes: Validation;
   url: Validation;
+  isDateSet: Validation;
+  isTimeSet: Validation;
   due: Validation;
+  priority: Validation;
 }
 
 export interface AddTodoFormData {
@@ -71,13 +75,12 @@ export interface AddTodoFormData {
 }
 
 export interface UpdateTodoFormData {
-  _id: string;
-  listId: string | null;
+  list: List | null;
   name: string;
   notes: string | null;
   url: string | null;
   isDateSet: boolean;
   isTimeSet: boolean;
   due: Date | Moment | string | null;
-  priority: TodoPriority;
+  priority: TodoPriorityOption;
 }

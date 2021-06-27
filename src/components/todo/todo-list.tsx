@@ -31,7 +31,7 @@ const TodoList: FC<TodoListProps> = ({ todos, onFinishAdd }) => {
       ))}
       <AddTodoForm
         open={addOpen}
-        opener={
+        overlay={
           <ListItem disableGutters button onClick={handleOpenAddForm}>
             <ListItemIcon>
               <AddOutlined />

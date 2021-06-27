@@ -1,17 +1,19 @@
 import 'fontsource-roboto';
 
-import React, { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, createRef, RefObject } from 'react';
 import NextApp, {
   AppProps as NextAppProps,
   AppContext as NextAppContext,
 } from 'next/app';
 import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
+import { IconButton } from '@material-ui/core';
+import { CloseOutlined } from '@material-ui/icons';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment';
 import cookie from 'cookie';
-import { SnackbarProvider } from 'notistack';
+import { SnackbarProvider, SnackbarKey } from 'notistack';
 
 // Moment Locale Config
 moment.updateLocale('en', {
@@ -46,6 +48,8 @@ interface AppProps extends NextAppProps {
 interface AppContext extends NextAppContext {}
 
 export default function App({ authenticated, pageProps, Component }: AppProps) {
+  const notistackRef: RefObject<SnackbarProvider> = createRef();
+
   const checkAuth = useCallback(async () => {
     try {
       if (authenticated && reduxStore.getState().auth.user === null) {
@@ -66,11 +70,27 @@ export default function App({ authenticated, pageProps, Component }: AppProps) {
     checkAuth();
   }, []);
 
+  const handleCloseSnackbar = (key: SnackbarKey) => {
+    notistackRef.current?.closeSnackbar(key);
+  };
+
   return (
     <ReduxProvider store={reduxStore}>
       <MuiThemeProvider theme={muiTheme}>
         <MuiPickersUtilsProvider utils={MomentUtils}>
-          <SnackbarProvider maxSnack={1} autoHideDuration={3000}>
+          <SnackbarProvider
+            ref={notistackRef}
+            maxSnack={1}
+            autoHideDuration={3000}
+            action={(key) => (
+              <IconButton
+                color={`inherit`}
+                onClick={() => handleCloseSnackbar(key)}
+              >
+                <CloseOutlined />
+              </IconButton>
+            )}
+          >
             <Component {...pageProps} />
           </SnackbarProvider>
         </MuiPickersUtilsProvider>

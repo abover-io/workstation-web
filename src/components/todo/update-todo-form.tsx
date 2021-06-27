@@ -1,4 +1,11 @@
-import { FC, useState, FormEvent, MouseEvent, ReactNode } from 'react';
+import {
+  FC,
+  useState,
+  useEffect,
+  FormEvent,
+  MouseEvent,
+  ReactNode,
+} from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   Grid,
@@ -31,7 +38,11 @@ import api from '@/api';
 
 // Types
 import { Validation } from '@/types';
-import { Todo, AddTodoFormValidation, AddTodoFormData } from '@/types/todo';
+import {
+  Todo,
+  UpdateTodoFormValidation,
+  UpdateTodoFormData,
+} from '@/types/todo';
 
 // Constants
 import { TodoPriorityOptions, TodoDueTimeFormats } from '@/constants/todo';
@@ -42,14 +53,16 @@ import { useAuth, useList } from '@/hooks';
 // Utils
 import { TodoValidator } from '@/utils/validator';
 
-export interface AddTodoFormProps {
+export interface UpdateTodoFormProps {
+  todo: Todo;
   open: boolean;
-  overlay: ReactNode;
+  overlay?: ReactNode;
   onClose: () => Promise<void> | void;
   onFinish: (todo: Todo) => Promise<void> | void;
 }
 
-const AddTodoForm: FC<AddTodoFormProps> = ({
+const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
+  todo,
   open,
   overlay,
   onClose,
@@ -70,7 +83,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
   );
   const [priorityAnchorEl, setPriorityAnchorEl] =
     useState<HTMLButtonElement | null>(null);
-  const [validations, setValidations] = useState<AddTodoFormValidation>({
+  const [validations, setValidations] = useState<UpdateTodoFormValidation>({
     listId: {
       error: false,
       text: '',
@@ -110,7 +123,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
   });
   const [dueTimeInput, setDueTimeInput] = useState<string>('');
   const [dueTime, setDueTime] = useState<Moment | null>(null);
-  const [formData, setFormData] = useState<AddTodoFormData>({
+  const [formData, setFormData] = useState<UpdateTodoFormData>({
     list: null,
     name: '',
     notes: null,
@@ -124,6 +137,46 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     }),
     priority: TodoPriorityOptions[0],
   });
+
+  useEffect(() => {
+    setFormData(
+      update(formData, {
+        list: {
+          $set: lists.filter((list) => list._id === todo.listId)[0] || null,
+        },
+        name: {
+          $set: todo.name,
+        },
+        notes: {
+          $set: todo.notes || null,
+        },
+        url: {
+          $set: todo.url || null,
+        },
+        isDateSet: {
+          $set: todo.isDateSet || true,
+        },
+        isTimeSet: {
+          $set: todo.isTimeSet || false,
+        },
+        due: {
+          $set:
+            moment(todo.due) ||
+            moment().set({
+              h: 0,
+              m: 0,
+              s: 0,
+            }),
+        },
+        priority: {
+          $set:
+            TodoPriorityOptions.filter(
+              (priority) => priority.value === todo.priority,
+            )[0] || TodoPriorityOptions[0],
+        },
+      }),
+    );
+  }, [todo]);
 
   const handleOpenDue = (e: MouseEvent<HTMLButtonElement>) => {
     setDueAnchorEl(e.currentTarget);
@@ -258,7 +311,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     );
   };
 
-  const handleChangeList = (list: AddTodoFormData['list']) => {
+  const handleChangeList = (list: UpdateTodoFormData['list']) => {
     setFormData(
       update(formData, {
         list: {
@@ -269,7 +322,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     setListAnchorEl(null);
   };
 
-  const handleChangePriority = (priority: AddTodoFormData['priority']) => {
+  const handleChangePriority = (priority: UpdateTodoFormData['priority']) => {
     setFormData(
       update(formData, {
         priority: {
@@ -280,60 +333,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     setPriorityAnchorEl(null);
   };
 
-  const reset = () => {
-    setValidations({
-      listId: {
-        error: false,
-        text: '',
-      },
-      name: {
-        error: false,
-        text: '',
-      },
-      notes: {
-        error: false,
-        text: '',
-      },
-      url: {
-        error: false,
-        text: '',
-      },
-      isDateSet: {
-        error: false,
-        text: '',
-      },
-      isTimeSet: {
-        error: false,
-        text: '',
-      },
-      due: {
-        error: false,
-        text: '',
-      },
-      priority: {
-        error: false,
-        text: '',
-      },
-    });
-    setDueTimeValidation({
-      error: false,
-      text: '',
-    });
-    setDueTimeInput('');
-    setDueTime(null);
-    setFormData({
-      list: null,
-      name: '',
-      notes: null,
-      url: null,
-      isDateSet: true,
-      isTimeSet: false,
-      due: moment(),
-      priority: TodoPriorityOptions[0],
-    });
-  };
-
-  const handleAddTodo = async (e: FormEvent) => {
+  const handleUpdateTodo = async (e: FormEvent) => {
     try {
       e.preventDefault();
 
@@ -344,7 +344,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
       ) {
         setLoading(true);
 
-        const { data } = await api.post('/todos', {
+        const { data } = await api.put(`/todos/${todo._id}`, {
           userId: user!._id,
           listId: formData.list !== null ? formData.list._id : null,
           name: formData.name,
@@ -360,8 +360,6 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
           variant: 'success',
           persist: false,
         });
-
-        reset();
 
         setLoading(false);
 
@@ -381,7 +379,6 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
   };
 
   const handleCancel = () => {
-    reset();
     onClose();
   };
 
@@ -394,7 +391,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
           className={classes.wrapper}
           container
           component={`form`}
-          onSubmit={handleAddTodo}
+          onSubmit={handleUpdateTodo}
           direction={`column`}
           spacing={1}
         >
@@ -407,6 +404,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
               multiline
               required
               placeholder={`e.g. Study Calculus.`}
+              value={formData.name}
               onChange={handleChangeName}
               error={validations.name.error}
               helperText={validations.name.text}
@@ -674,7 +672,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
                   loading ||
                   Object.values(validations).some((v) => v.error === true)
                 }
-              >{`Add`}</Button>
+              >{`Update`}</Button>
             </Grid>
           </Grid>
         </Grid>
@@ -683,7 +681,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
   );
 };
 
-export default AddTodoForm;
+export default UpdateTodoForm;
 
 const useStyles = makeStyles((theme) =>
   createStyles({
