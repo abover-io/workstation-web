@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 type ContainerProps = {

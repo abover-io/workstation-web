@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
+import { useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -413,7 +413,7 @@ export default function SignUp() {
   };
 
   return (
-    <Layout title={`Sign Up`}>
+    <Layout title={`Sign Up`} header={false} footer={false}>
       <Grid
         className={classes.wrapper}
         container

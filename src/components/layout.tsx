@@ -1,23 +1,40 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
+import { Toolbar } from '@material-ui/core';
+
+// Styles
+import { GlobalStyles } from '@/styles';
 
 // Components
 import CustomHead from './custom-head';
+import Header from './header';
+import Footer from './footer';
 
 interface LayoutProps {
   title?: string;
   children: ReactNode;
+  header?: boolean;
+  footer?: boolean;
 }
 
-const Layout: FC<LayoutProps> = ({ title, children }) => {
+const Layout: FC<LayoutProps> = ({
+  title,
+  children,
+  header = true,
+  footer = true,
+}) => {
   return (
     <>
       <CustomHead title={title} />
+      <GlobalStyles />
 
-      {/* <Header /> */}
+      {header && <Header />}
 
-      {children}
+      <main>
+        {header && <Toolbar />}
+        {children}
+      </main>
 
-      {/* <Footer /> */}
+      {footer && <Footer />}
     </>
   );
 };

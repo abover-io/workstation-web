@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { LinearProgress, Grid } from '@material-ui/core';
 import { AssignmentTurnedIn as AssignmentTurnedInIcon } from '@material-ui/icons';

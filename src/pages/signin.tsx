@@ -1,4 +1,4 @@
-import React, {
+import {
   FC,
   useState,
   useEffect,
@@ -190,7 +190,7 @@ const SignIn: FC<{}> = () => {
   };
 
   return (
-    <Layout title={`Sign In`}>
+    <Layout title={`Sign In`} header={false} footer={false}>
       <Grid
         className={classes.wrapper}
         container

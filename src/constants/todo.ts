@@ -5,20 +5,24 @@ import { TodoPriority, TodoPriorityOption } from '@/types/todo';
 
 export const TodoPriorityOptions: TodoPriorityOption[] = [
   {
+    key: 'none',
     label: 'None',
     value: TodoPriority.NONE,
   },
   {
+    key: 'low',
     label: 'Low',
     value: TodoPriority.LOW,
     color: colors.blue[500],
   },
   {
+    key: 'medium',
     label: 'Medium',
     value: TodoPriority.MEDIUM,
     color: colors.orange[500],
   },
   {
+    key: 'high',
     label: 'High',
     value: TodoPriority.HIGH,
     color: colors.red[500],
