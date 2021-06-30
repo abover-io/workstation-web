@@ -413,7 +413,7 @@ export default function SignUp() {
   };
 
   return (
-    <Layout title={`Sign Up`}>
+    <Layout title={`Sign Up`} header={false} footer={false}>
       <Grid
         className={classes.wrapper}
         container

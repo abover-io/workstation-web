@@ -5,33 +5,38 @@ import {
   IconButtonProps,
   Popover,
   PopoverProps,
-  List,
+  List as MuiList,
   ListItem,
   ListItemIcon,
   ListItemText,
 } from '@material-ui/core';
-import { FlagOutlined } from '@material-ui/icons';
+import {
+  InboxOutlined,
+  FiberManualRecord as FiberManualRecordIcon,
+} from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 
 // Types
-import { Todo, TodoPriorityOption } from '@/types/todo';
+import { List } from '@/types/list';
+import { Todo } from '@/types/todo';
 
 // API
 import api from '@/api';
 
-// Constants
-import { TodoPriorityOptions } from '@/constants/todo';
+// Custom Hooks
+import { useList } from '@/hooks';
 
-export interface TodoPriorityPickerProps {
+export interface TodoListPickerProps {
   todo: Todo;
-  onFinishUpdatePriority: (todo: Todo) => Promise<void> | void;
+  onFinishUpdateList: (todo: Todo) => Promise<void> | void;
 }
 
-const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
+const TodoListPicker: FC<TodoListPickerProps> = ({
   todo,
-  onFinishUpdatePriority,
+  onFinishUpdateList,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { lists } = useList();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -48,12 +53,12 @@ const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
     setAnchorEl(null);
   };
 
-  const handleUpdatePriority = async (newPriority: TodoPriorityOption) => {
+  const handleUpdateList = async (newList: List | null) => {
     try {
       setLoading(true);
 
-      const { data } = await api.patch(`/todos/priority/${todo._id}`, {
-        priority: newPriority.value,
+      const { data } = await api.patch(`/todos/list/${todo._id}`, {
+        listId: newList !== null ? newList._id : null,
       });
 
       enqueueSnackbar(data.message, {
@@ -64,7 +69,7 @@ const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
       setLoading(false);
       setAnchorEl(null);
 
-      onFinishUpdatePriority(data.todo);
+      onFinishUpdateList(data.todo);
     } catch (err) {
       setLoading(false);
 
@@ -77,21 +82,23 @@ const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
     }
   };
 
-  const priority = TodoPriorityOptions.filter(
-    (p) => p.value === todo.priority,
-  )[0];
+  const list: List | null =
+    lists.filter((l) => l._id === todo.listId)[0] || null;
 
   return (
     <>
-      <Tooltip title={priority.label} aria-label={priority.label}>
+      <Tooltip
+        title={list !== null ? list.name : `All`}
+        aria-label={list !== null ? list.name : `All`}
+      >
         <IconButton
           disabled={loading}
           onClick={handleOpen}
           style={{
-            color: priority.color,
+            color: list !== null ? list.color : undefined,
           }}
         >
-          <FlagOutlined />
+          {list !== null ? <FiberManualRecordIcon /> : <InboxOutlined />}
         </IconButton>
       </Tooltip>
 
@@ -108,26 +115,25 @@ const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
           horizontal: 'center',
         }}
       >
-        <List>
-          {TodoPriorityOptions.map((priority) => (
-            <ListItem
-              key={priority.value}
-              button
-              onClick={() => handleUpdatePriority(priority)}
-            >
-              <ListItemIcon style={{ color: priority.color }}>
-                <FlagOutlined color={`inherit`} />
+        <MuiList>
+          <ListItem button onClick={() => handleUpdateList(null)}>
+            <ListItemIcon>
+              <InboxOutlined />
+            </ListItemIcon>
+            <ListItemText primary={`All`} />
+          </ListItem>
+          {lists.map((l) => (
+            <ListItem key={l._id} button onClick={() => handleUpdateList(l)}>
+              <ListItemIcon style={{ color: l.color }}>
+                <FiberManualRecordIcon color={`inherit`} />
               </ListItemIcon>
-              <ListItemText
-                primary={priority.label}
-                style={{ color: priority.color }}
-              />
+              <ListItemText primary={l.name} style={{ color: l.color }} />
             </ListItem>
           ))}
-        </List>
+        </MuiList>
       </Popover>
     </>
   );
 };
 
-export default TodoPriorityPicker;
+export default TodoListPicker;

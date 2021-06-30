@@ -12,22 +12,29 @@ import Footer from './footer';
 interface LayoutProps {
   title?: string;
   children: ReactNode;
+  header?: boolean;
+  footer?: boolean;
 }
 
-const Layout: FC<LayoutProps> = ({ title, children }) => {
+const Layout: FC<LayoutProps> = ({
+  title,
+  children,
+  header = true,
+  footer = true,
+}) => {
   return (
     <>
       <CustomHead title={title} />
       <GlobalStyles />
 
-      <Header />
+      {header && <Header />}
 
       <main>
-        <Toolbar />
+        {header && <Toolbar />}
         {children}
       </main>
 
-      <Footer />
+      {footer && <Footer />}
     </>
   );
 };

@@ -1,5 +1,6 @@
 import { FC, useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
+import { useDispatch } from 'react-redux';
 import {
   IconButton,
   Avatar,
@@ -15,8 +16,12 @@ import api from '@/api';
 // Custom Hooks
 import { useAuth } from '@/hooks';
 
+// Redux Actions
+import { setUser } from '@/redux/actions/auth';
+
 const UserHeaderMenu: FC<{}> = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const user = useAuth().user!;
   const [menuButton, setMenuButton] = useState<HTMLElement | null>(null);
@@ -33,6 +38,7 @@ const UserHeaderMenu: FC<{}> = () => {
     try {
       const { data } = await api.post('/auth/signout');
       localStorage.clear();
+      dispatch(setUser(null));
       enqueueSnackbar(data.message, {
         variant: 'success',
       });

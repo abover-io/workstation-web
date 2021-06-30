@@ -16,7 +16,8 @@ export type Validation = {
   text: string;
 };
 
-export interface Option<T = string, U = any> {
-  label: T;
-  value: U;
+export interface Option<K = any, L = string, V = any> {
+  key: K;
+  label: L;
+  value: V;
 }
