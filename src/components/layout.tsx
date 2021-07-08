@@ -1,4 +1,5 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, CSSProperties } from 'react';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { Toolbar } from '@material-ui/core';
 
 // Styles
@@ -19,9 +20,11 @@ interface LayoutProps {
 const Layout: FC<LayoutProps> = ({
   title,
   children,
-  header = true,
-  footer = true,
+  header = false,
+  footer = false,
 }) => {
+  const classes = useStyles();
+
   return (
     <>
       <CustomHead title={title} />
@@ -29,7 +32,7 @@ const Layout: FC<LayoutProps> = ({
 
       {header && <Header />}
 
-      <main>
+      <main className={classes.main}>
         {header && <Toolbar />}
         {children}
       </main>
@@ -40,3 +43,11 @@ const Layout: FC<LayoutProps> = ({
 };
 
 export default Layout;
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    main: {
+      margin: theme.spacing(2, 0),
+    },
+  }),
+);

@@ -242,7 +242,6 @@ export default function SignUp() {
               onSuccess={googleSignInOnSuccess}
               onFailure={googleSignInOnFailure}
               cookiePolicy={`single_host_origin`}
-              isSignedIn
               render={(renderProps) => (
                 <GoogleLoginButton
                   onClick={renderProps.onClick}
@@ -413,7 +412,7 @@ export default function SignUp() {
   };
 
   return (
-    <Layout title={`Sign Up`} header={false} footer={false}>
+    <Layout title={`Sign Up`}>
       <Grid
         className={classes.wrapper}
         container
