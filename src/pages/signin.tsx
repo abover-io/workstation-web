@@ -190,7 +190,7 @@ const SignIn: FC<{}> = () => {
   };
 
   return (
-    <Layout title={`Sign In`} header={false} footer={false}>
+    <Layout title={`Sign In`}>
       <Grid
         className={classes.wrapper}
         container

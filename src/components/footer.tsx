@@ -62,8 +62,6 @@ export default Footer;
 const useStyles = makeStyles((theme) =>
   createStyles({
     wrapper: {
-      position: 'absolute',
-      bottom: 0,
       backgroundColor: theme.palette.secondary.main,
       padding: theme.spacing(0.5, 0),
       '& > *': {

@@ -3,11 +3,11 @@ import { useRouter } from 'next/router';
 import {
   AppBar,
   Toolbar,
-  IconButton,
+  // IconButton,
   Typography,
   Button,
 } from '@material-ui/core';
-import { MenuOutlined } from '@material-ui/icons';
+// import { MenuOutlined } from '@material-ui/icons';
 
 // Custom Hooks
 import { useAuth } from '@/hooks';
@@ -30,9 +30,9 @@ const Header: FC<{}> = () => {
   return (
     <AppBar position={`fixed`}>
       <Toolbar>
-        <IconButton edge={`start`} color={`inherit`} aria-label={`home-menu`}>
+        {/* <IconButton edge={`start`} color={`inherit`} aria-label={`home-menu`}>
           <MenuOutlined />
-        </IconButton>
+        </IconButton> */}
 
         <Typography
           variant={`h6`}
