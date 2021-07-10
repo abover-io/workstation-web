@@ -50,7 +50,13 @@ const UserHeaderMenu: FC<{}> = () => {
     <>
       <IconButton onClick={handleShowMenu} color={`inherit`}>
         {user.profileImageURL ? (
-          <Avatar alt={user.email} src={user.profileImageURL} />
+          <Avatar
+            alt={user.email}
+            src={user.profileImageURL}
+            imgProps={{
+              referrerPolicy: 'no-referrer',
+            }}
+          />
         ) : (
           <Avatar>
             {user.name

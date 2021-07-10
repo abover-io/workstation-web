@@ -6,16 +6,27 @@ import { Todo } from '@/types/todo';
 
 // Constants
 import {
+  // Todo
   SET_TOTAL_TODOS,
   SET_TODOS,
   ADD_TODO,
   UPDATE_TODO,
   DELETE_TODO,
+  // Overdue
+  SET_TOTAL_OVERDUES,
+  SET_OVERDUES,
+  ADD_OVERDUE,
+  UPDATE_OVERDUE,
+  DELETE_OVERDUE,
 } from '@/constants/redux/todo';
 
 const initialState: TodoReducer = {
   total: 0,
   todos: [] as Todo[],
+  overdue: {
+    total: 0,
+    todos: [] as Todo[],
+  },
 };
 
 export default function todoReducer(
@@ -23,6 +34,8 @@ export default function todoReducer(
   action: Action,
 ): TodoReducer {
   switch (action.type) {
+    // Todo
+
     case SET_TOTAL_TODOS:
       return update(state, {
         total: {
@@ -66,6 +79,66 @@ export default function todoReducer(
       return update(state, {
         todos: {
           $set: state.todos.filter((todo) => todo._id !== action.payload),
+        },
+      });
+
+    // Overdue
+
+    case SET_TOTAL_OVERDUES:
+      return update(state, {
+        overdue: {
+          total: {
+            $set: action.payload,
+          },
+        },
+      });
+
+    case SET_OVERDUES:
+      return update(state, {
+        overdue: {
+          todos: {
+            $set: action.payload,
+          },
+        },
+      });
+
+    case ADD_OVERDUE:
+      return update(state, {
+        overdue: {
+          total: {
+            $set: state.overdue.total + 1,
+          },
+          todos: {
+            $push: [action.payload],
+          },
+        },
+      });
+
+    case UPDATE_OVERDUE:
+      const updatedOverdue: Todo = action.payload;
+      const newOverdues: Todo[] = state.overdue.todos.map((overdue) => {
+        if (overdue._id === updatedOverdue._id) {
+          return updatedOverdue;
+        }
+
+        return overdue;
+      });
+      return update(state, {
+        overdue: {
+          todos: {
+            $set: newOverdues,
+          },
+        },
+      });
+
+    case DELETE_OVERDUE:
+      return update(state, {
+        overdue: {
+          todos: {
+            $set: state.overdue.todos.filter(
+              (overdue) => overdue._id !== action.payload,
+            ),
+          },
         },
       });
 

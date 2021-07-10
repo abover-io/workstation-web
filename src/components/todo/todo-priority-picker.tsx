@@ -12,6 +12,8 @@ import {
 } from '@material-ui/core';
 import { FlagOutlined } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
+import moment from 'moment';
+import update from 'immutability-helper';
 
 // Types
 import { Todo, TodoPriorityOption } from '@/types/todo';
@@ -64,7 +66,13 @@ const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
       setLoading(false);
       setAnchorEl(null);
 
-      onFinishUpdatePriority(data.todo);
+      onFinishUpdatePriority(
+        update(data.todo, {
+          due: {
+            $set: moment(data.todo.due),
+          },
+        }),
+      );
     } catch (err) {
       setLoading(false);
 

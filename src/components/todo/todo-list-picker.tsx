@@ -15,6 +15,8 @@ import {
   FiberManualRecord as FiberManualRecordIcon,
 } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
+import moment from 'moment';
+import update from 'immutability-helper';
 
 // Types
 import { List } from '@/types/list';
@@ -69,7 +71,13 @@ const TodoListPicker: FC<TodoListPickerProps> = ({
       setLoading(false);
       setAnchorEl(null);
 
-      onFinishUpdateList(data.todo);
+      onFinishUpdateList(
+        update(data.todo, {
+          due: {
+            $set: moment(data.todo.due),
+          },
+        }),
+      );
     } catch (err) {
       setLoading(false);
 

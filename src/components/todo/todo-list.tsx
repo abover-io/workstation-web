@@ -1,8 +1,14 @@
 import { FC, useState } from 'react';
-import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import {
+  List as MuiList,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core';
 import { AddOutlined } from '@material-ui/icons';
 
 // Types
+import { List } from '@/types/list';
 import { Todo } from '@/types/todo';
 
 // Components
@@ -12,9 +18,10 @@ import AddTodoForm, { AddTodoFormProps } from './add-todo-form';
 export interface TodoListProps {
   todos: Todo[];
   onFinishAdd: AddTodoFormProps['onFinish'];
+  list?: List;
 }
 
-const TodoList: FC<TodoListProps> = ({ todos, onFinishAdd }) => {
+const TodoList: FC<TodoListProps> = ({ todos, onFinishAdd, list }) => {
   const [addOpen, setAddOpen] = useState<boolean>(false);
 
   const handleOpenAddForm = () => {
@@ -25,7 +32,7 @@ const TodoList: FC<TodoListProps> = ({ todos, onFinishAdd }) => {
   };
 
   return (
-    <List disablePadding>
+    <MuiList disablePadding>
       {todos.map((todo) => (
         <TodoItem key={todo._id} todo={todo} />
       ))}
@@ -41,8 +48,11 @@ const TodoList: FC<TodoListProps> = ({ todos, onFinishAdd }) => {
         }
         onClose={handleCloseAddForm}
         onFinish={onFinishAdd}
+        defaultTodo={{
+          list,
+        }}
       />
-    </List>
+    </MuiList>
   );
 };
 

@@ -12,9 +12,7 @@ export interface Todo {
   name: string;
   notes: string | null;
   url: string | null;
-  isDateSet: boolean;
-  isTimeSet: boolean;
-  due: Date | Moment | string | null;
+  due: Moment;
   completed: boolean;
   priority: TodoPriority;
 }
@@ -36,9 +34,7 @@ export interface TodoValidator {
   Name: (input: string) => Validation;
   Notes: (input: string | null) => Validation;
   URL: (input: string | null) => Validation;
-  IsDateSet: (input: boolean) => Validation;
-  IsTimeSet: (input: boolean) => Validation;
-  Due: (input: string | null) => Validation;
+  Due: (input: string) => Validation;
   Priority: (input: string) => Validation;
 }
 
@@ -47,8 +43,6 @@ export interface AddTodoFormValidation {
   name: Validation;
   notes: Validation;
   url: Validation;
-  isDateSet: Validation;
-  isTimeSet: Validation;
   due: Validation;
   priority: Validation;
 }
@@ -58,8 +52,6 @@ export interface UpdateTodoFormValidation {
   name: Validation;
   notes: Validation;
   url: Validation;
-  isDateSet: Validation;
-  isTimeSet: Validation;
   due: Validation;
   priority: Validation;
 }
@@ -69,9 +61,7 @@ export interface AddTodoFormData {
   name: string;
   notes: string | null;
   url: string | null;
-  isDateSet: boolean;
-  isTimeSet: boolean;
-  due: Date | Moment | string | null;
+  due: Moment;
   priority: TodoPriorityOption;
 }
 
@@ -80,8 +70,6 @@ export interface UpdateTodoFormData {
   name: string;
   notes: string | null;
   url: string | null;
-  isDateSet: boolean;
-  isTimeSet: boolean;
-  due: Date | Moment | string | null;
+  due: Moment;
   priority: TodoPriorityOption;
 }
