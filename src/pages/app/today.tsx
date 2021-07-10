@@ -3,6 +3,10 @@ import { NextPage } from 'next';
 import { useDispatch } from 'react-redux';
 import { Grid, Typography } from '@material-ui/core';
 import moment from 'moment';
+import update from 'immutability-helper';
+
+// Types
+import { Todo } from '@/types/todo';
 
 // API
 import api from '@/api';
@@ -20,7 +24,7 @@ import TodoList, { TodoListProps } from '@/components/todo/todo-list';
 // Redux Actions
 import { setTotalTodos, setTodos, addTodo } from '@/redux/actions/todo';
 
-const Today: NextPage = () => {
+const TodayPage: NextPage = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState<boolean>(false);
   const { total, todos } = useTodo();
@@ -36,7 +40,17 @@ const Today: NextPage = () => {
       });
 
       dispatch(setTotalTodos(data.total));
-      dispatch(setTodos(data.todos));
+      dispatch(
+        setTodos(
+          data.todos.map((todo: Todo) =>
+            update(todo, {
+              due: {
+                $set: moment(todo.due),
+              },
+            }),
+          ),
+        ),
+      );
 
       setLoading(false);
     } catch (err) {
@@ -79,4 +93,4 @@ const Today: NextPage = () => {
   );
 };
 
-export default withAuth(Today);
+export default withAuth(TodayPage);

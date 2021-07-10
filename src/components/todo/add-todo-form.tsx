@@ -1,4 +1,11 @@
-import { FC, useState, FormEvent, MouseEvent, ReactNode } from 'react';
+import {
+  FC,
+  useState,
+  useEffect,
+  FormEvent,
+  MouseEvent,
+  ReactNode,
+} from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   Grid,
@@ -47,6 +54,7 @@ export interface AddTodoFormProps {
   overlay: ReactNode;
   onClose: () => Promise<void> | void;
   onFinish: (todo: Todo) => Promise<void> | void;
+  defaultTodo?: Partial<AddTodoFormData>;
 }
 
 const AddTodoForm: FC<AddTodoFormProps> = ({
@@ -54,6 +62,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
   overlay,
   onClose,
   onFinish,
+  defaultTodo,
 }) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
@@ -87,14 +96,6 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
       error: false,
       text: '',
     },
-    isDateSet: {
-      error: false,
-      text: '',
-    },
-    isTimeSet: {
-      error: false,
-      text: '',
-    },
     due: {
       error: false,
       text: '',
@@ -108,6 +109,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     error: false,
     text: '',
   });
+  const [isTimeSet, setIsTimeSet] = useState<boolean>(false);
   const [dueTimeInput, setDueTimeInput] = useState<string>('');
   const [dueTime, setDueTime] = useState<Moment | null>(null);
   const [formData, setFormData] = useState<AddTodoFormData>({
@@ -115,8 +117,6 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     name: '',
     notes: null,
     url: null,
-    isDateSet: true,
-    isTimeSet: false,
     due: moment().set({
       h: 0,
       m: 0,
@@ -125,6 +125,18 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     priority: TodoPriorityOptions[0],
   });
 
+  useEffect(() => {
+    if (defaultTodo?.list) {
+      setFormData(
+        update(formData, {
+          list: {
+            $set: defaultTodo.list,
+          },
+        }),
+      );
+    }
+  }, [defaultTodo]);
+
   const handleOpenDue = (e: MouseEvent<HTMLButtonElement>) => {
     setDueAnchorEl(e.currentTarget);
   };
@@ -132,7 +144,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     setDueAnchorEl(null);
   };
   const handleOpenDueTime = (e: MouseEvent<HTMLButtonElement>) => {
-    if (formData.isTimeSet) {
+    if (isTimeSet) {
       setDueTimeInput((formData.due as Moment).format('hh:mm A'));
       setDueTime(formData.due as Moment);
     }
@@ -184,7 +196,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     setFormData(
       update(formData, {
         due: {
-          $set: due,
+          $set: due as Moment,
         },
       }),
     );
@@ -214,22 +226,14 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
     e.preventDefault();
 
     if (dueTime !== null) {
+      setIsTimeSet(true);
       setFormData(
         update(formData, {
-          isDateSet: {
-            $set: true,
-          },
-          isTimeSet: {
-            $set: true,
-          },
           due: {
-            $set:
-              formData.due === null
-                ? dueTime
-                : (formData.due as Moment).set({
-                    h: dueTime.get('h'),
-                    m: dueTime.get('m'),
-                  }),
+            $set: (formData.due as Moment).set({
+              h: dueTime.get('h'),
+              m: dueTime.get('m'),
+            }),
           },
         }),
       );
@@ -241,17 +245,16 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
       error: false,
       text: '',
     });
+    setIsTimeSet(false);
     setDueTimeInput('');
     setDueTime(null);
     setFormData(
       update(formData, {
-        isTimeSet: {
-          $set: false,
-        },
         due: {
           $set: (formData.due as Moment).set({
             h: 0,
             m: 0,
+            s: 0,
           }),
         },
       }),
@@ -298,14 +301,6 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
         error: false,
         text: '',
       },
-      isDateSet: {
-        error: false,
-        text: '',
-      },
-      isTimeSet: {
-        error: false,
-        text: '',
-      },
       due: {
         error: false,
         text: '',
@@ -326,9 +321,11 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
       name: '',
       notes: null,
       url: null,
-      isDateSet: true,
-      isTimeSet: false,
-      due: moment(),
+      due: moment().set({
+        h: 0,
+        m: 0,
+        s: 0,
+      }),
       priority: TodoPriorityOptions[0],
     });
   };
@@ -350,8 +347,6 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
           name: formData.name,
           notes: formData.notes,
           url: formData.url,
-          isDateSet: formData.isDateSet,
-          isTimeSet: formData.isTimeSet,
           due: formData.due,
           priority: formData.priority.value,
         });
@@ -366,7 +361,13 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
         setLoading(false);
 
         onClose();
-        onFinish(data.todo);
+        onFinish(
+          update(data.todo, {
+            due: {
+              $set: moment(data.todo.due),
+            },
+          }),
+        );
       }
     } catch (err) {
       setLoading(false);
@@ -463,7 +464,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
                   container
                   justify={`space-between`}
                 >
-                  {!formData.isTimeSet ? (
+                  {!isTimeSet ? (
                     <Button
                       variant={`text`}
                       disabled={loading}

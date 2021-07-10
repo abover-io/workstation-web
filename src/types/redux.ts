@@ -26,4 +26,8 @@ export interface ListReducer {
 export interface TodoReducer {
   total: number;
   todos: Todo[];
+  overdue: {
+    total: number;
+    todos: Todo[];
+  };
 }

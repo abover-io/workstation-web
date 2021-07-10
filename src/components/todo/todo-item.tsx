@@ -20,6 +20,9 @@ import { Todo } from '@/types/todo';
 // API
 import api from '@/api';
 
+// Constants
+import { TodoPriorityOptions } from '@/constants/todo';
+
 // Redux Actions
 import { addTodo, updateTodo, deleteTodo } from '@/redux/actions/todo';
 
@@ -131,6 +134,15 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
     dispatch(updateTodo(todo));
   };
 
+  const dueTime: string =
+    todo.due.get('h') > 0
+      ? todo.due.format('ddd, hh:mm A')
+      : todo.due.format('ddd');
+
+  const priority =
+    TodoPriorityOptions.filter((p) => p.value === todo.priority)[0] ||
+    TodoPriorityOptions[0];
+
   return (
     <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <ListItem disableGutters divider disabled={loading}>
@@ -144,10 +156,17 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
                 tabIndex={-1}
                 inputProps={{ 'aria-labelledby': todo._id }}
                 onChange={handleCompleteTodo}
+                style={{
+                  color: priority.color,
+                }}
               />
             </ListItemIcon>
 
-            <ListItemText id={todo._id} primary={todo.name} />
+            <ListItemText
+              id={todo._id}
+              primary={todo.name}
+              secondary={dueTime}
+            />
 
             {showActions && (
               <ListItemSecondaryAction>
