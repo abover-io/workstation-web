@@ -1,5 +1,6 @@
-import { FC, useState } from 'react';
+import { FC, useState, CSSProperties } from 'react';
 import { useDispatch } from 'react-redux';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   ListItem,
   ListItemIcon,
@@ -38,6 +39,7 @@ interface TodoItemProps {
 }
 
 const TodoItem: FC<TodoItemProps> = ({ todo }) => {
+  const classes = useStyles();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState<boolean>(false);
@@ -102,7 +104,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
               color={`inherit`}
               onClick={handleUncompleteTodo}
             >
-              {`Undo`}
+              Undo
             </Button>
           ),
         });
@@ -134,10 +136,14 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
     dispatch(updateTodo(todo));
   };
 
+  const handleFinishDelete: UpdateTodoFormProps['onFinishDelete'] = (todo) => {
+    dispatch(deleteTodo(todo._id));
+  };
+
   const dueTime: string =
     todo.due.get('h') > 0
-      ? todo.due.format('ddd, hh:mm A')
-      : todo.due.format('ddd');
+      ? `${todo.due.calendar()} at ${todo.due.format('h:mm a')}`
+      : todo.due.calendar();
 
   const priority =
     TodoPriorityOptions.filter((p) => p.value === todo.priority)[0] ||
@@ -169,7 +175,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
             />
 
             {showActions && (
-              <ListItemSecondaryAction>
+              <ListItemSecondaryAction className={classes.actionWrapper}>
                 <TodoListPicker
                   todo={todo}
                   onFinishUpdateList={handleFinishUpdateList}
@@ -197,6 +203,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
           open={openUpdate}
           onClose={handleCloseUpdateForm}
           onFinish={handleFinishUpdate}
+          onFinishDelete={handleFinishDelete}
         />
       </ListItem>
     </div>
@@ -204,3 +211,13 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
 };
 
 export default TodoItem;
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    actionWrapper: {
+      '& > .MuiIconButton-root': {
+        padding: theme.spacing(0.5),
+      } as CSSProperties,
+    },
+  }),
+);

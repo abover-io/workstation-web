@@ -12,7 +12,7 @@ const Loading: FC<{}> = () => {
     <Container>
       <Grid
         container
-        justify={`center`}
+        justifyContent={`center`}
         alignContent={`center`}
         direction={`column`}
       >

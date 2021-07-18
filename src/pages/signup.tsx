@@ -1,4 +1,5 @@
-import { useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
+import { useState, FormEvent, ChangeEvent } from 'react';
+import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -27,14 +28,17 @@ import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 import update from 'immutability-helper';
 
+// Typings
+import { ISignUpFormData, ISignUpFormValidations } from '@/types/auth';
+
 // API
 import api from '@/api';
 
 // Config
 import { GOOGLE_OAUTH_WEB_CLIENT_ID } from '@/config';
 
-// Typings
-import { ISignUpFormData, ISignUpFormValidations } from '@/types/auth';
+// HOCs
+import { withoutAuth } from '@/hocs';
 
 // Components
 import { Layout } from '@/components';
@@ -47,7 +51,7 @@ import { setUser } from '@/redux/actions/auth';
 
 type SignUpStep = 'email' | 'name-password';
 
-export default function SignUp() {
+const SignUp: NextPage = () => {
   const classes = useStyles();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -417,13 +421,13 @@ export default function SignUp() {
         className={classes.wrapper}
         container
         direction={`column`}
-        justify={`center`}
+        justifyContent={`center`}
       >
         {handleRenderSteps(currentStep)}
 
         <Divider />
 
-        <Grid item container justify={`center`}>
+        <Grid item container justifyContent={`center`}>
           <Button
             className={clsx(classes.button, classes.signInButton)}
             variant={`text`}
@@ -437,7 +441,9 @@ export default function SignUp() {
       </Grid>
     </Layout>
   );
-}
+};
+
+export default withoutAuth(SignUp);
 
 const useStyles = makeStyles((theme) =>
   createStyles({

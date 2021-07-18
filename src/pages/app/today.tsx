@@ -40,17 +40,7 @@ const TodayPage: NextPage = () => {
       });
 
       dispatch(setTotalTodos(data.total));
-      dispatch(
-        setTodos(
-          data.todos.map((todo: Todo) =>
-            update(todo, {
-              due: {
-                $set: moment(todo.due),
-              },
-            }),
-          ),
-        ),
-      );
+      dispatch(setTodos(data.todos));
 
       setLoading(false);
     } catch (err) {
@@ -63,7 +53,7 @@ const TodayPage: NextPage = () => {
   }, []);
 
   const handleFinishAddTodo: TodoListProps['onFinishAdd'] = (todo) => {
-    if (todo.due === null || moment(todo.due).isSame(moment(), 'd')) {
+    if (todo.due.isSame(moment(), 'd')) {
       dispatch(addTodo(todo));
     }
   };

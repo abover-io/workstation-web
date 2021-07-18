@@ -45,7 +45,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
   const { user } = useAuth();
   const { lists } = useList();
   const [open, setOpen] = useState<boolean>(false);
-  const [openLists, setOpenLists] = useState<boolean>(false);
+  const [openLists, setOpenLists] = useState<boolean>(true);
 
   const handleOpen = () => {
     setOpen(true);
@@ -152,7 +152,10 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                             <ListItemIcon style={{ color: list.color }}>
                               <FiberManualRecordIcon color={`inherit`} />
                             </ListItemIcon>
-                            <ListItemText primary={list.name} />
+                            <ListItemText
+                              primary={list.name}
+                              style={{ color: list.color }}
+                            />
                           </ListItem>
                         ))}
                       </List>
@@ -184,7 +187,7 @@ const useStyles = makeStyles((theme) =>
       zIndex: theme.zIndex.drawer + 101,
     },
     drawerPaper: {
-      width: '80%',
+      width: '100%',
     },
     drawerContent: {
       padding: theme.spacing(1, 0),
