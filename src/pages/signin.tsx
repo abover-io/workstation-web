@@ -195,7 +195,7 @@ const SignIn: FC<{}> = () => {
         className={classes.wrapper}
         container
         direction={`column`}
-        justify={`center`}
+        justifyContent={`center`}
       >
         <Grid item>
           <Typography className={classes.headerText} variant={`h5`}>
@@ -316,7 +316,7 @@ const SignIn: FC<{}> = () => {
 
           <Divider />
 
-          <Grid item container justify={`center`}>
+          <Grid item container justifyContent={`center`}>
             <Button
               className={clsx(classes.button, classes.signUpButton)}
               onClick={() => router.push('/signup')}

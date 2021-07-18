@@ -33,7 +33,7 @@ const Home: FC<{}> = () => {
         className={classes.wrapper}
         container
         direction={`column`}
-        justify={`space-around`}
+        justifyContent={`space-around`}
         alignItems={`center`}
       >
         <Grid item>

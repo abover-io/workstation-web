@@ -222,9 +222,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
       setDueTime(null);
     }
   };
-  const handleSetDueTime = (e: FormEvent) => {
-    e.preventDefault();
-
+  const handleSetDueTime = () => {
     if (dueTime !== null) {
       setIsTimeSet(true);
       setFormData(
@@ -237,8 +235,8 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
           },
         }),
       );
-      handleCloseDueTime();
     }
+    handleCloseDueTime();
   };
   const handleUnsetDueTime = () => {
     setDueTimeValidation({
@@ -419,7 +417,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
             item
             container
             wrap={`wrap`}
-            justify={`flex-start`}
+            justifyContent={`flex-start`}
             alignItems={`center`}
             spacing={1}
           >
@@ -462,7 +460,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
                 <Grid
                   className={classes.timePanel}
                   container
-                  justify={`space-between`}
+                  justifyContent={`space-between`}
                 >
                   {!isTimeSet ? (
                     <Button
@@ -500,13 +498,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
                     className: classes.timePaper,
                   }}
                 >
-                  <Grid
-                    container
-                    component={`form`}
-                    direction={`column`}
-                    spacing={1}
-                    onSubmit={handleSetDueTime}
-                  >
+                  <Grid container direction={`column`} spacing={1}>
                     <Grid item>
                       <TextField
                         fullWidth
@@ -520,7 +512,12 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
                         helperText={dueTimeValidation.text}
                       />
                     </Grid>
-                    <Grid item container justify={`flex-end`} spacing={1}>
+                    <Grid
+                      item
+                      container
+                      justifyContent={`flex-end`}
+                      spacing={1}
+                    >
                       <Grid item>
                         <Button
                           variant={`text`}
@@ -532,16 +529,19 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
 
                       <Grid item>
                         <Button
-                          variant={`contained`}
-                          type={`submit`}
-                          color={`primary`}
-                          size={`small`}
+                          variant='contained'
+                          type='button'
+                          color='primary'
+                          size='small'
                           disabled={
                             loading ||
                             dueTimeValidation.error ||
                             dueTime === null
                           }
-                        >{`Add`}</Button>
+                          onClick={handleSetDueTime}
+                        >
+                          Add
+                        </Button>
                       </Grid>
                     </Grid>
                   </Grid>
@@ -566,7 +566,7 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
                   borderColor: formData.list?.color,
                 }}
               >
-                {formData.list === null ? `All` : formData.list.name}
+                {formData.list === null ? 'All' : formData.list.name}
               </Button>
 
               <Popover
@@ -657,13 +657,15 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
             </Grid>
           </Grid>
 
-          <Grid item container justify={`flex-end`} spacing={1}>
+          <Grid item container justifyContent={`flex-end`} spacing={1}>
             <Grid item>
               <Button
                 variant={`text`}
                 disabled={loading}
                 onClick={handleCancel}
-              >{`Cancel`}</Button>
+              >
+                Cancel
+              </Button>
             </Grid>
 
             <Grid item>
@@ -675,7 +677,9 @@ const AddTodoForm: FC<AddTodoFormProps> = ({
                   loading ||
                   Object.values(validations).some((v) => v.error === true)
                 }
-              >{`Add`}</Button>
+              >
+                Add
+              </Button>
             </Grid>
           </Grid>
         </Grid>

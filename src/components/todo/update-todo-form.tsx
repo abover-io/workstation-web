@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
+  colors,
   Grid,
   ButtonGroup,
   Button,
@@ -28,6 +29,7 @@ import {
   InboxOutlined,
   CalendarTodayOutlined,
   ClearOutlined,
+  DeleteOutlined,
 } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import moment, { Moment } from 'moment';
@@ -53,12 +55,16 @@ import { useAuth, useList } from '@/hooks';
 // Utils
 import { TodoValidator } from '@/utils/validator';
 
+// Components
+import DeleteTodoDialog, { DeleteTodoDialogProps } from './delete-todo-dialog';
+
 export interface UpdateTodoFormProps {
   todo: Todo;
   open: boolean;
   overlay?: ReactNode;
   onClose: () => Promise<void> | void;
   onFinish: (todo: Todo) => Promise<void> | void;
+  onFinishDelete: DeleteTodoDialogProps['onFinish'];
 }
 
 const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
@@ -67,12 +73,14 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
   overlay,
   onClose,
   onFinish,
+  onFinishDelete,
 }) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuth();
   const { lists } = useList();
   const [loading, setLoading] = useState<boolean>(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [dueAnchorEl, setDueAnchorEl] = useState<HTMLButtonElement | null>(
     null,
   );
@@ -100,14 +108,6 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
       error: false,
       text: '',
     },
-    isDateSet: {
-      error: false,
-      text: '',
-    },
-    isTimeSet: {
-      error: false,
-      text: '',
-    },
     due: {
       error: false,
       text: '',
@@ -128,8 +128,6 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
     name: '',
     notes: null,
     url: null,
-    isDateSet: true,
-    isTimeSet: false,
     due: moment().set({
       h: 0,
       m: 0,
@@ -153,20 +151,8 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
         url: {
           $set: todo.url || null,
         },
-        isDateSet: {
-          $set: todo.isDateSet || true,
-        },
-        isTimeSet: {
-          $set: todo.isTimeSet || false,
-        },
         due: {
-          $set:
-            moment(todo.due) ||
-            moment().set({
-              h: 0,
-              m: 0,
-              s: 0,
-            }),
+          $set: todo.due,
         },
         priority: {
           $set:
@@ -176,6 +162,14 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
         },
       }),
     );
+
+    if (
+      `${todo.due.get('h')}-${todo.due.get('m')}-${todo.due.get('s')}` !==
+      '0-0-0'
+    ) {
+      setDueTime(todo.due);
+      setDueTimeInput(formData.due.format('hh:mm A'));
+    }
   }, [todo]);
 
   const handleOpenDue = (e: MouseEvent<HTMLButtonElement>) => {
@@ -185,20 +179,19 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
     setDueAnchorEl(null);
   };
   const handleOpenDueTime = (e: MouseEvent<HTMLButtonElement>) => {
-    if (formData.isTimeSet) {
-      setDueTimeInput((formData.due as Moment).format('hh:mm A'));
-      setDueTime(formData.due as Moment);
+    if (
+      `${todo.due.get('h')}-${todo.due.get('m')}-${todo.due.get('s')}` !==
+      '0-0-0'
+    ) {
+      setDueTimeInput(formData.due.format('hh:mm A'));
+      setDueTime(formData.due);
+      setDueTimeAnchorEl(e.currentTarget);
+      return;
     }
 
     setDueTimeAnchorEl(e.currentTarget);
   };
   const handleCloseDueTime = () => {
-    setDueTimeValidation({
-      error: false,
-      text: '',
-    });
-    setDueTimeInput('');
-    setDueTime(null);
     setDueTimeAnchorEl(null);
   };
 
@@ -237,10 +230,11 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
     setFormData(
       update(formData, {
         due: {
-          $set: due,
+          $set: due as Moment,
         },
       }),
     );
+
     setDueAnchorEl(null);
   };
   const handleChangeDueTime: TextFieldProps['onChange'] = (e) => {
@@ -263,31 +257,20 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
       setDueTime(null);
     }
   };
-  const handleSetDueTime = (e: FormEvent) => {
-    e.preventDefault();
-
+  const handleSetDueTime = () => {
     if (dueTime !== null) {
       setFormData(
         update(formData, {
-          isDateSet: {
-            $set: true,
-          },
-          isTimeSet: {
-            $set: true,
-          },
           due: {
-            $set:
-              formData.due === null
-                ? dueTime
-                : (formData.due as Moment).set({
-                    h: dueTime.get('h'),
-                    m: dueTime.get('m'),
-                  }),
+            $set: (formData.due as Moment).set({
+              h: dueTime.get('h'),
+              m: dueTime.get('m'),
+            }),
           },
         }),
       );
-      handleCloseDueTime();
     }
+    handleCloseDueTime();
   };
   const handleUnsetDueTime = () => {
     setDueTimeValidation({
@@ -298,17 +281,24 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
     setDueTime(null);
     setFormData(
       update(formData, {
-        isTimeSet: {
-          $set: false,
-        },
         due: {
-          $set: (formData.due as Moment).set({
+          $set: formData.due.set({
             h: 0,
             m: 0,
+            s: 0,
           }),
         },
       }),
     );
+  };
+  const handleCancelDueTime = () => {
+    setDueTimeValidation({
+      error: false,
+      text: '',
+    });
+    setDueTimeInput('');
+    setDueTime(null);
+    handleCloseDueTime();
   };
 
   const handleChangeList = (list: UpdateTodoFormData['list']) => {
@@ -350,8 +340,6 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
           name: formData.name,
           notes: formData.notes,
           url: formData.url,
-          isDateSet: formData.isDateSet,
-          isTimeSet: formData.isTimeSet,
           due: formData.due,
           priority: formData.priority.value,
         });
@@ -376,6 +364,14 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
         });
       }
     }
+  };
+
+  const handleOpenDeleteDialog = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
   };
 
   const handleCancel = () => {
@@ -416,7 +412,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
             item
             container
             wrap={`wrap`}
-            justify={`flex-start`}
+            justifyContent={`flex-start`}
             alignItems={`center`}
             spacing={1}
           >
@@ -444,7 +440,6 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                 }}
               >
                 <DatePicker
-                  autoOk
                   disableToolbar
                   disablePast
                   variant={`static`}
@@ -459,9 +454,9 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                 <Grid
                   className={classes.timePanel}
                   container
-                  justify={`space-between`}
+                  justifyContent={`space-between`}
                 >
-                  {!formData.isTimeSet ? (
+                  {!formData.due.get('h') ? (
                     <Button
                       variant={`text`}
                       disabled={loading}
@@ -497,13 +492,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                     className: classes.timePaper,
                   }}
                 >
-                  <Grid
-                    container
-                    component={`form`}
-                    direction={`column`}
-                    spacing={1}
-                    onSubmit={handleSetDueTime}
-                  >
+                  <Grid container direction={`column`} spacing={1}>
                     <Grid item>
                       <TextField
                         fullWidth
@@ -517,27 +506,33 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                         helperText={dueTimeValidation.text}
                       />
                     </Grid>
-                    <Grid item container justify={`flex-end`} spacing={1}>
+                    <Grid
+                      item
+                      container
+                      justifyContent={`flex-end`}
+                      spacing={1}
+                    >
                       <Grid item>
                         <Button
                           variant={`text`}
                           disabled={loading}
                           size={`small`}
-                          onClick={handleCloseDueTime}
+                          onClick={handleCancelDueTime}
                         >{`Cancel`}</Button>
                       </Grid>
 
                       <Grid item>
                         <Button
-                          variant={`contained`}
-                          type={`submit`}
-                          color={`primary`}
-                          size={`small`}
+                          variant='contained'
+                          type='button'
                           disabled={
                             loading ||
                             dueTimeValidation.error ||
                             dueTime === null
                           }
+                          onClick={handleSetDueTime}
+                          color={`primary`}
+                          size={`small`}
                         >{`Add`}</Button>
                       </Grid>
                     </Grid>
@@ -590,9 +585,6 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                     <ListItem
                       key={list._id}
                       onClick={() => handleChangeList(list)}
-                      style={{
-                        color: list.color,
-                      }}
                     >
                       <ListItemIcon style={{ color: list.color }}>
                         <FiberManualRecordIcon color={`inherit`} />
@@ -654,25 +646,52 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
             </Grid>
           </Grid>
 
-          <Grid item container justify={`flex-end`} spacing={1}>
-            <Grid item>
-              <Button
-                variant={`text`}
-                disabled={loading}
-                onClick={handleCancel}
-              >{`Cancel`}</Button>
+          <Grid item container justifyContent={`space-between`}>
+            <Grid item container justifyContent={`flex-start`}>
+              <Grid item>
+                <Button
+                  variant={`text`}
+                  disabled={loading}
+                  onClick={handleOpenDeleteDialog}
+                  startIcon={<DeleteOutlined />}
+                  style={{
+                    color: colors.red[500],
+                  }}
+                >
+                  Delete Todo
+                </Button>
+
+                <DeleteTodoDialog
+                  todo={todo}
+                  open={deleteDialogOpen}
+                  onCancel={handleCancelDelete}
+                  onFinish={onFinishDelete}
+                />
+              </Grid>
             </Grid>
 
-            <Grid item>
-              <Button
-                type={`submit`}
-                variant={`contained`}
-                color={`primary`}
-                disabled={
-                  loading ||
-                  Object.values(validations).some((v) => v.error === true)
-                }
-              >{`Update`}</Button>
+            <Grid item container justifyContent={`flex-end`} spacing={1}>
+              <Grid item>
+                <Button
+                  variant={`text`}
+                  disabled={loading}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </Grid>
+
+              <Grid item>
+                <Button
+                  type={`submit`}
+                  variant={`contained`}
+                  color={`primary`}
+                  disabled={
+                    loading ||
+                    Object.values(validations).some((v) => v.error === true)
+                  }
+                >{`Update`}</Button>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

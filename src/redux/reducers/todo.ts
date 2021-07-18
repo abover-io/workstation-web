@@ -20,6 +20,9 @@ import {
   DELETE_OVERDUE,
 } from '@/constants/redux/todo';
 
+// Utils
+import { convertToMoment } from '@/utils/todo';
+
 const initialState: TodoReducer = {
   total: 0,
   todos: [] as Todo[],
@@ -46,7 +49,9 @@ export default function todoReducer(
     case SET_TODOS:
       return update(state, {
         todos: {
-          $set: action.payload,
+          $set: (action as Action<Todo[]>).payload.map((todo) =>
+            convertToMoment(todo),
+          ),
         },
       });
 
@@ -56,13 +61,13 @@ export default function todoReducer(
           $set: state.total + 1,
         },
         todos: {
-          $push: [action.payload],
+          $push: [convertToMoment((action as Action<Todo>).payload)],
         },
       });
 
     case UPDATE_TODO:
-      const updatedTodo: Todo = action.payload;
-      const newTodos: Todo[] = state.todos.map((todo) => {
+      const updatedTodo = (action as Action<Todo>).payload;
+      const newTodos = state.todos.map((todo) => {
         if (todo._id === updatedTodo._id) {
           return updatedTodo;
         }
@@ -71,7 +76,7 @@ export default function todoReducer(
       });
       return update(state, {
         todos: {
-          $set: newTodos,
+          $set: newTodos.map((todo) => convertToMoment(todo)),
         },
       });
 
@@ -97,7 +102,9 @@ export default function todoReducer(
       return update(state, {
         overdue: {
           todos: {
-            $set: action.payload,
+            $set: (action as Action<Todo[]>).payload.map((todo) =>
+              convertToMoment(todo),
+            ),
           },
         },
       });
@@ -109,14 +116,14 @@ export default function todoReducer(
             $set: state.overdue.total + 1,
           },
           todos: {
-            $push: [action.payload],
+            $push: [convertToMoment((action as Action<Todo>).payload)],
           },
         },
       });
 
     case UPDATE_OVERDUE:
-      const updatedOverdue: Todo = action.payload;
-      const newOverdues: Todo[] = state.overdue.todos.map((overdue) => {
+      const updatedOverdue = (action as Action<Todo>).payload;
+      const newOverdues = state.overdue.todos.map((overdue) => {
         if (overdue._id === updatedOverdue._id) {
           return updatedOverdue;
         }
@@ -126,7 +133,7 @@ export default function todoReducer(
       return update(state, {
         overdue: {
           todos: {
-            $set: newOverdues,
+            $set: newOverdues.map((todo) => convertToMoment(todo)),
           },
         },
       });
