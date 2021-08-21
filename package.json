@@ -17,11 +17,12 @@
   "scripts": {
     "dev": "next -p 8010",
     "build": "next build",
-    "start": "next start -p $PORT"
+    "start": "next start -p $PORT",
+    "prepare": "husky install"
   },
   "dependencies": {
-    "@date-io/moment": "1.x",
-    "@material-ui/core": "^4.12.1",
+    "@date-io/moment": "2.11.0",
+    "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/pickers": "^3.3.10",
@@ -32,28 +33,29 @@
     "fontsource-roboto": "^4.0.0",
     "immutability-helper": "^3.1.1",
     "moment": "^2.26.0",
-    "next": "^11.0.1",
+    "next": "^11.1.0",
     "next-compose-plugins": "^2.2.1",
-    "notistack": "^1.0.9",
+    "notistack": "^1.0.10",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-google-login": "^5.2.2",
     "react-redux": "^7.2.4",
-    "react-social-login-buttons": "^3.5.0",
-    "redux": "^4.1.0",
-    "sass": "^1.35.2"
+    "react-social-login-buttons": "^3.5.1",
+    "redux": "^4.1.1",
+    "sass": "^1.38.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.5",
+    "@babel/core": "^7.15.0",
     "@svgr/webpack": "^5.4.0",
     "@types/moment": "^2.13.0",
-    "@types/node": "^16.0.1",
-    "@types/react": "^17.0.14",
+    "@types/node": "^16.7.1",
+    "@types/react": "^17.0.19",
     "@types/react-redux": "^7.1.17",
     "@types/redux": "^3.6.0",
     "babel-loader": "^8.1.0",
     "npm-run-all": "^4.1.5",
-    "ts-loader": "^9.2.3",
-    "typescript": "~4.3.5"
+    "ts-loader": "^9.2.5",
+    "typescript": "~4.3.5",
+    "husky": "^7.0.0"
   }
 }
