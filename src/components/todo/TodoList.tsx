@@ -5,7 +5,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@material-ui/core';
-import { AddOutlined } from '@material-ui/icons';
+import { Add as AddIcon } from '@material-ui/icons';
 
 // Types
 import { List } from '@/types/list';
@@ -41,7 +41,7 @@ const TodoList: FC<TodoListProps> = ({ todos, onFinishAdd, list }) => {
         overlay={
           <ListItem disableGutters button onClick={handleOpenAddForm}>
             <ListItemIcon>
-              <AddOutlined />
+              <AddIcon />
             </ListItemIcon>
             <ListItemText primary={`Add Todo`} />
           </ListItem>

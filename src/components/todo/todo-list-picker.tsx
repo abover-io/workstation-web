@@ -11,7 +11,7 @@ import {
   ListItemText,
 } from '@material-ui/core';
 import {
-  InboxOutlined,
+  Inbox as InboxIcon,
   FiberManualRecord as FiberManualRecordIcon,
 } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
@@ -106,7 +106,7 @@ const TodoListPicker: FC<TodoListPickerProps> = ({
             color: list !== null ? list.color : undefined,
           }}
         >
-          {list !== null ? <FiberManualRecordIcon /> : <InboxOutlined />}
+          {list !== null ? <FiberManualRecordIcon /> : <InboxIcon />}
         </IconButton>
       </Tooltip>
 
@@ -126,7 +126,7 @@ const TodoListPicker: FC<TodoListPickerProps> = ({
         <MuiList>
           <ListItem button onClick={() => handleUpdateList(null)}>
             <ListItemIcon>
-              <InboxOutlined />
+              <InboxIcon />
             </ListItemIcon>
             <ListItemText primary={`All`} />
           </ListItem>

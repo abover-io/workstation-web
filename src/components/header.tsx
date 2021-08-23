@@ -7,7 +7,6 @@ import {
   Typography,
   Button,
 } from '@material-ui/core';
-// import { MenuOutlined } from '@material-ui/icons';
 
 // Custom Hooks
 import { useAuth } from '@/hooks';
@@ -30,10 +29,6 @@ const Header: FC<{}> = () => {
   return (
     <AppBar position={`fixed`}>
       <Toolbar>
-        {/* <IconButton edge={`start`} color={`inherit`} aria-label={`home-menu`}>
-          <MenuOutlined />
-        </IconButton> */}
-
         <Typography
           variant={`h6`}
           style={{ flexGrow: 1 }}

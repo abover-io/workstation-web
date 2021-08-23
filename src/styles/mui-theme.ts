@@ -5,9 +5,11 @@ export default createTheme({
   palette: {
     primary: {
       main: colors.blue[500],
+      contrastText: colors.common.white,
     },
     secondary: {
-      main: colors.blueGrey[50],
+      main: colors.red[500],
+      contrastText: colors.common.white,
     },
   },
 });

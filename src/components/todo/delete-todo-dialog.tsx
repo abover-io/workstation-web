@@ -53,7 +53,7 @@ const DeleteTodoDialog: FC<DeleteTodoDialogProps> = ({
   return (
     <Dialog open={open}>
       <DialogContent>
-        <Typography>Are you sure you want to delete "{todo.name}"?</Typography>
+        <Typography>Are you sure you want to delete {todo.name}?</Typography>
       </DialogContent>
       <DialogActions>
         <Button

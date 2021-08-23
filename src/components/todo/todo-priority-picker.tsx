@@ -10,7 +10,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@material-ui/core';
-import { FlagOutlined } from '@material-ui/icons';
+import { Flag as FlagIcon } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import moment from 'moment';
 import update from 'immutability-helper';
@@ -99,7 +99,7 @@ const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
             color: priority.color,
           }}
         >
-          <FlagOutlined />
+          <FlagIcon />
         </IconButton>
       </Tooltip>
 
@@ -124,7 +124,7 @@ const TodoPriorityPicker: FC<TodoPriorityPickerProps> = ({
               onClick={() => handleUpdatePriority(priority)}
             >
               <ListItemIcon style={{ color: priority.color }}>
-                <FlagOutlined color={`inherit`} />
+                <FlagIcon color={`inherit`} />
               </ListItemIcon>
               <ListItemText
                 primary={priority.label}

@@ -1,13 +1,20 @@
 import { FC, useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   IconButton,
   Avatar,
   Popover,
   MenuList,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@material-ui/core';
+import {
+  Settings as SettingsIcon,
+  ExitToApp as SignOutIcon,
+} from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 
 // API
@@ -19,15 +26,20 @@ import { useAuth } from '@/hooks';
 // Redux Actions
 import { setUser } from '@/redux/actions/auth';
 
-const UserHeaderMenu: FC<{}> = () => {
+const UserHeaderMenu: FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const user = useAuth().user!;
   const [menuButton, setMenuButton] = useState<HTMLElement | null>(null);
 
   const handleShowMenu = (e: MouseEvent<HTMLButtonElement>): void => {
-    setMenuButton(e.currentTarget);
+    if (menuButton) {
+      return setMenuButton(null);
+    }
+
+    return setMenuButton(e.currentTarget);
   };
 
   const handleHideMenu = (): void => {
@@ -49,7 +61,7 @@ const UserHeaderMenu: FC<{}> = () => {
   return (
     <>
       <IconButton onClick={handleShowMenu} color={`inherit`}>
-        {user.profileImageURL ? (
+        {user?.profileImageURL ? (
           <Avatar
             alt={user.email}
             src={user.profileImageURL}
@@ -81,8 +93,44 @@ const UserHeaderMenu: FC<{}> = () => {
         open={Boolean(menuButton)}
         onClose={handleHideMenu}
       >
-        <MenuList>
-          <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
+        <MenuList
+          disablePadding
+          subheader={
+            <MenuItem button={false}>
+              <ListItemIcon className={classes.profileIcon}>
+                {user.profileImageURL ? (
+                  <Avatar
+                    alt={user.email}
+                    src={user.profileImageURL}
+                    imgProps={{
+                      referrerPolicy: 'no-referrer',
+                    }}
+                  />
+                ) : (
+                  <Avatar>
+                    {user.name
+                      .split(' ')
+                      .map((n) => n[0].toUpperCase())
+                      .join('')}
+                  </Avatar>
+                )}
+              </ListItemIcon>
+              <ListItemText primary={user.name} secondary={user.email} />
+            </MenuItem>
+          }
+        >
+          <MenuItem onClick={() => router.push('/app/settings')}>
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary='Settings' />
+          </MenuItem>
+          <MenuItem onClick={handleSignOut}>
+            <ListItemIcon>
+              <SignOutIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText primary='Sign out' />
+          </MenuItem>
         </MenuList>
       </Popover>
     </>
@@ -90,3 +138,11 @@ const UserHeaderMenu: FC<{}> = () => {
 };
 
 export default UserHeaderMenu;
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    profileIcon: {
+      marginRight: theme.spacing(2),
+    },
+  }),
+);

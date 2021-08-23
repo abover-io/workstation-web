@@ -3,19 +3,18 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   colors,
   Grid,
-  ButtonGroup,
+  Divider,
   IconButton,
   Typography,
   Link,
 } from '@material-ui/core';
 import {
   GitHub as GitHubIcon,
-  LinkedIn as LinkedInIcon,
-  FavoriteOutlined,
+  Favorite as FavoriteIcon,
 } from '@material-ui/icons';
 
 // Constants
-import { GitHubLink, LinkedInLink, PersonalWebsiteLink } from '@/constants';
+import { GitHubLink, PersonalWebsiteLink } from '@/constants';
 
 const Footer: FC<{}> = () => {
   const classes = useStyles();
@@ -26,32 +25,34 @@ const Footer: FC<{}> = () => {
       container
       component={`footer`}
       direction={`column`}
-      alignItems={`center`}
+      spacing={2}
     >
       <Grid item>
-        <ButtonGroup variant={`text`} size={`large`}>
-          <IconButton href={GitHubLink} target={`_blank`}>
-            <GitHubIcon fontSize={`large`} />
-          </IconButton>
-
-          <IconButton href={LinkedInLink} target={`_blank`}>
-            <LinkedInIcon fontSize={`large`} />
-          </IconButton>
-        </ButtonGroup>
+        <Divider />
       </Grid>
 
-      <Grid item>
-        <Typography>
-          {`Made with`}{' '}
-          <IconButton className={classes.love}>
-            <FavoriteOutlined color={`inherit`} fontSize={`small`} />
-          </IconButton>{' '}
-          {`by`}{' '}
-          <Link
-            href={PersonalWebsiteLink}
-            target={`_blank`}
-          >{`rafiandria23.me`}</Link>
-        </Typography>
+      <Grid item container direction='row' justifyContent='center'>
+        <Grid item>
+          <Typography>
+            {`Made with`}{' '}
+            <IconButton className={classes.love}>
+              <FavoriteIcon color={`inherit`} fontSize={`small`} />
+            </IconButton>{' '}
+            {`by`}{' '}
+            <Link
+              href={PersonalWebsiteLink}
+              target={`_blank`}
+            >{`rafiandria23.me`}</Link>
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid item container direction='row' justifyContent='center' spacing={1}>
+        <Grid item>
+          <IconButton href={GitHubLink} target={`_blank`}>
+            <GitHubIcon fontSize='large' />
+          </IconButton>
+        </Grid>
       </Grid>
     </Grid>
   );
@@ -62,11 +63,11 @@ export default Footer;
 const useStyles = makeStyles((theme) =>
   createStyles({
     wrapper: {
-      backgroundColor: theme.palette.secondary.main,
-      padding: theme.spacing(0.5, 0),
-      '& > *': {
-        margin: theme.spacing(1, 0),
-      },
+      // padding: theme.spacing(0.5, 0),
+      // '& > *': {
+      //   margin: theme.spacing(1, 0),
+      // },
+      marginTop: theme.spacing(1),
     },
     love: {
       cursor: 'default',

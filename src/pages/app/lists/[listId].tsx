@@ -70,10 +70,14 @@ const ListPage: NextPage = () => {
         }
       }
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetchTodos();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFinishAddTodo: TodoListProps['onFinishAdd'] = (todo) => {
