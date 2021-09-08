@@ -1,12 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { NextPage } from 'next';
 import { useDispatch } from 'react-redux';
 import { Grid, Typography } from '@material-ui/core';
 import moment from 'moment';
-import update from 'immutability-helper';
-
-// Types
-import { Todo } from '@/types/todo';
 
 // API
 import api from '@/api';
@@ -26,13 +22,10 @@ import { setTotalTodos, setTodos, addTodo } from '@/redux/actions/todo';
 
 const TodayPage: NextPage = () => {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState<boolean>(false);
-  const { total, todos } = useTodo();
+  const { todos } = useTodo();
 
   const fetchTodos = useCallback(async () => {
     try {
-      setLoading(true);
-
       const { data } = await api.get('/todos', {
         params: {
           due: moment().format('MM-DD-YYYY'),
@@ -41,15 +34,15 @@ const TodayPage: NextPage = () => {
 
       dispatch(setTotalTodos(data.total));
       dispatch(setTodos(data.todos));
+    } catch (err) {}
 
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetchTodos();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFinishAddTodo: TodoListProps['onFinishAdd'] = (todo) => {

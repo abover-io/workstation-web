@@ -93,7 +93,7 @@ const Home: FC<{}> = () => {
 
         <Grid item>
           <Typography variant={`h5`} align={`center`} gutterBottom>
-            It's everywhere
+            It&apos;s everywhere
           </Typography>
 
           <ButtonGroup size={`large`}>

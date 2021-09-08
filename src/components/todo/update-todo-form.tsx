@@ -23,13 +23,13 @@ import {
 } from '@material-ui/core';
 import { DatePicker, DatePickerProps } from '@material-ui/pickers';
 import {
-  AddOutlined,
-  FlagOutlined,
+  Add as AddIcon,
+  Flag as FlagIcon,
   FiberManualRecord as FiberManualRecordIcon,
-  InboxOutlined,
-  CalendarTodayOutlined,
-  ClearOutlined,
-  DeleteOutlined,
+  Inbox as InboxIcon,
+  CalendarToday as CalendarTodayIcon,
+  Clear as ClearIcon,
+  Delete as DeleteIcon,
 } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import moment, { Moment } from 'moment';
@@ -170,6 +170,8 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
       setDueTime(todo.due);
       setDueTimeInput(formData.due.format('hh:mm A'));
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todo]);
 
   const handleOpenDue = (e: MouseEvent<HTMLButtonElement>) => {
@@ -420,7 +422,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
               <Button
                 variant={`outlined`}
                 disabled={loading}
-                startIcon={<CalendarTodayOutlined />}
+                startIcon={<CalendarTodayIcon />}
                 onClick={handleOpenDue}
               >
                 {(formData.due as Moment).calendar()}
@@ -460,7 +462,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                     <Button
                       variant={`text`}
                       disabled={loading}
-                      startIcon={<AddOutlined />}
+                      startIcon={<AddIcon />}
                       onClick={handleOpenDueTime}
                     >{`Add Time`}</Button>
                   ) : (
@@ -470,7 +472,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                       </Button>
 
                       <Button onClick={handleUnsetDueTime}>
-                        <ClearOutlined />
+                        <ClearIcon />
                       </Button>
                     </ButtonGroup>
                   )}
@@ -547,7 +549,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                 disabled={loading}
                 startIcon={
                   formData.list === null ? (
-                    <InboxOutlined />
+                    <InboxIcon />
                   ) : (
                     <FiberManualRecordIcon />
                   )
@@ -577,7 +579,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                 <List>
                   <ListItem onClick={() => handleChangeList(null)}>
                     <ListItemIcon>
-                      <InboxOutlined />
+                      <InboxIcon />
                     </ListItemIcon>
                     <ListItemText primary={`All`} />
                   </ListItem>
@@ -608,7 +610,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                   color: formData.priority.color,
                   borderColor: formData.priority.color,
                 }}
-                startIcon={<FlagOutlined />}
+                startIcon={<FlagIcon />}
               >
                 {formData.priority.label}
               </Button>
@@ -633,7 +635,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                       onClick={() => handleChangePriority(priority)}
                     >
                       <ListItemIcon style={{ color: priority.color }}>
-                        <FlagOutlined color={`inherit`} />
+                        <FlagIcon color={`inherit`} />
                       </ListItemIcon>
                       <ListItemText
                         primary={priority.label}
@@ -653,7 +655,7 @@ const UpdateTodoForm: FC<UpdateTodoFormProps> = ({
                   variant={`text`}
                   disabled={loading}
                   onClick={handleOpenDeleteDialog}
-                  startIcon={<DeleteOutlined />}
+                  startIcon={<DeleteIcon />}
                   style={{
                     color: colors.red[500],
                   }}

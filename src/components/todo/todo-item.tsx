@@ -12,7 +12,7 @@ import {
   Button,
   ButtonProps,
 } from '@material-ui/core';
-import { EditOutlined } from '@material-ui/icons';
+import { Edit as EditIcon } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 
 // Types
@@ -98,7 +98,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
         enqueueSnackbar(data.message, {
           variant: 'success',
           persist: false,
-          action: () => (
+          action: (
             <Button
               variant={`text`}
               color={`inherit`}
@@ -191,7 +191,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
                   aria-label={`update-todo`}
                   onClick={handleOpenUpdateForm}
                 >
-                  <EditOutlined />
+                  <EditIcon />
                 </IconButton>
               </ListItemSecondaryAction>
             )}

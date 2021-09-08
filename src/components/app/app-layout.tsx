@@ -15,13 +15,13 @@ import {
   Collapse,
 } from '@material-ui/core';
 import {
-  MenuOutlined,
-  CloseOutlined,
-  CalendarTodayOutlined,
-  EventNoteOutlined,
+  Menu as MenuIcon,
+  Close,
+  CalendarToday as CalendarTodayIcon,
+  EventNote as EventNoteIcon,
   FiberManualRecord as FiberManualRecordIcon,
-  KeyboardArrowRightOutlined,
-  KeyboardArrowDownOutlined,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
 } from '@material-ui/icons';
 
 // Styles
@@ -40,8 +40,8 @@ interface AppLayoutProps {
 }
 
 const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
-  const classes = useStyles();
   const router = useRouter();
+  const classes = useStyles();
   const { user } = useAuth();
   const { lists } = useList();
   const [open, setOpen] = useState<boolean>(false);
@@ -74,7 +74,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                       color={`inherit`}
                       onClick={handleClose}
                     >
-                      <CloseOutlined />
+                      <Close />
                     </IconButton>
                   ) : (
                     <IconButton
@@ -82,14 +82,13 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                       color={`inherit`}
                       onClick={handleOpen}
                     >
-                      <MenuOutlined />
+                      <MenuIcon />
                     </IconButton>
                   )}
 
-                  <Typography
-                    variant={`h6`}
-                    style={{ flexGrow: 1 }}
-                  >{`Fancy Todo`}</Typography>
+                  <Typography className={classes.title} variant={`h6`}>
+                    Fancy Todo
+                  </Typography>
 
                   <UserHeaderMenu />
                 </Toolbar>
@@ -110,7 +109,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                   <List>
                     <ListItem button onClick={() => router.push('/app/today')}>
                       <ListItemIcon>
-                        <CalendarTodayOutlined />
+                        <CalendarTodayIcon />
                       </ListItemIcon>
                       <ListItemText primary={`Today`} />
                     </ListItem>
@@ -119,7 +118,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                       onClick={() => router.push('/app/scheduled')}
                     >
                       <ListItemIcon>
-                        <EventNoteOutlined />
+                        <EventNoteIcon />
                       </ListItemIcon>
                       <ListItemText primary={`Scheduled`} />
                     </ListItem>
@@ -131,9 +130,9 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                     <ListItem button onClick={handleToggleLists}>
                       <ListItemIcon>
                         {openLists ? (
-                          <KeyboardArrowDownOutlined />
+                          <KeyboardArrowDownIcon />
                         ) : (
-                          <KeyboardArrowRightOutlined />
+                          <KeyboardArrowRightIcon />
                         )}
                       </ListItemIcon>
                       <ListItemText primary={`Lists`} />
@@ -187,13 +186,18 @@ const useStyles = makeStyles((theme) =>
       zIndex: theme.zIndex.drawer + 101,
     },
     drawerPaper: {
-      width: '100%',
+      minWidth: theme.spacing(32),
     },
     drawerContent: {
       padding: theme.spacing(1, 0),
     },
     main: {
       padding: theme.spacing(4),
+    },
+    title: {
+      flexGrow: 1,
+      marginLeft: theme.spacing(1),
+      fontWeight: theme.typography.fontWeightBold,
     },
   }),
 );

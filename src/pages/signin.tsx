@@ -1,11 +1,4 @@
-import {
-  FC,
-  useState,
-  useEffect,
-  FormEvent,
-  MouseEvent,
-  ChangeEvent,
-} from 'react';
+import { FC, useState, FormEvent, MouseEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';

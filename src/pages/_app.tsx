@@ -8,7 +8,7 @@ import NextApp, {
 import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import { IconButton } from '@material-ui/core';
-import { CloseOutlined } from '@material-ui/icons';
+import { Close as CloseIcon } from '@material-ui/icons';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment';
@@ -68,6 +68,8 @@ export default function App({ authenticated, pageProps, Component }: AppProps) {
 
   useEffect(() => {
     checkAuth();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCloseSnackbar = (key: SnackbarKey) => {
@@ -87,7 +89,7 @@ export default function App({ authenticated, pageProps, Component }: AppProps) {
                 color={`inherit`}
                 onClick={() => handleCloseSnackbar(key)}
               >
-                <CloseOutlined />
+                <CloseIcon />
               </IconButton>
             )}
           >

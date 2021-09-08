@@ -229,189 +229,192 @@ const SignUp: NextPage = () => {
   };
 
   const handleRenderSteps = (step: SignUpStep) => {
-    if (step === 'email') {
-      return (
-        <>
-          <Grid item>
-            <Typography className={classes.headerText} variant={`h5`}>
-              Sign up
-            </Typography>
-          </Grid>
-
-          <Grid item>
-            <GoogleLogin
-              className={classes.googleButton}
-              clientId={GOOGLE_OAUTH_WEB_CLIENT_ID}
-              buttonText={`Continue with Google`}
-              onSuccess={googleSignInOnSuccess}
-              onFailure={googleSignInOnFailure}
-              cookiePolicy={`single_host_origin`}
-              render={(renderProps) => (
-                <GoogleLoginButton
-                  onClick={renderProps.onClick}
-                  preventActiveStyles
-                >
-                  <Typography variant={`body2`}>
-                    Continue with Google
-                  </Typography>
-                </GoogleLoginButton>
-              )}
-            />
-          </Grid>
-
-          <Divider />
-
-          <Grid
-            item
-            container
-            className={classes.form}
-            component={`form`}
-            direction={`column`}
-            onSubmit={(
-              e: FormEvent<
-                HTMLFormElement | HTMLInputElement | HTMLTextAreaElement
-              >,
-            ) => handleValidateCurrentStep(e, 'email')}
-            noValidate={false}
-            autoComplete={`on`}
-          >
+    switch (step) {
+      case 'email':
+        return (
+          <>
             <Grid item>
-              <TextField
-                autoComplete={`email`}
-                fullWidth
-                name={`email`}
-                required
-                type={`email`}
-                label={`Email`}
-                value={formData.email}
-                onChange={handleChange}
-                error={validations.email.error}
-                helperText={validations.email.text}
-                disabled={loading}
-                size={`small`}
-                variant={`outlined`}
+              <Typography className={classes.headerText} variant={`h5`}>
+                Sign up
+              </Typography>
+            </Grid>
+
+            <Grid item>
+              <GoogleLogin
+                className={classes.googleButton}
+                clientId={GOOGLE_OAUTH_WEB_CLIENT_ID}
+                buttonText={`Continue with Google`}
+                onSuccess={googleSignInOnSuccess}
+                onFailure={googleSignInOnFailure}
+                cookiePolicy={`single_host_origin`}
+                render={(renderProps) => (
+                  <GoogleLoginButton
+                    onClick={renderProps.onClick}
+                    preventActiveStyles
+                  >
+                    <Typography variant={`body2`}>
+                      Continue with Google
+                    </Typography>
+                  </GoogleLoginButton>
+                )}
               />
             </Grid>
 
-            <Grid item>
-              <Button
-                className={clsx(classes.button, classes.signUpButton)}
-                fullWidth
-                variant={`contained`}
-                color={`primary`}
-                type={`submit`}
-                disabled={loading}
-                size={`medium`}
-              >
-                {`Sign up with email`}
-              </Button>
-            </Grid>
-          </Grid>
-        </>
-      );
-    }
+            <Divider />
 
-    if (step === 'name-password') {
-      return (
-        <>
-          <Grid item>
-            <Button
-              className={clsx(classes.button, classes.backButton)}
-              onClick={() => setCurrentStep('email')}
-              startIcon={<ArrowBackIcon />}
-              size={`small`}
+            <Grid
+              item
+              container
+              className={classes.form}
+              component={`form`}
+              direction={`column`}
+              onSubmit={(
+                e: FormEvent<
+                  HTMLFormElement | HTMLInputElement | HTMLTextAreaElement
+                >,
+              ) => handleValidateCurrentStep(e, 'email')}
+              noValidate={false}
+              autoComplete={`on`}
             >
-              {formData.email}
-            </Button>
-          </Grid>
+              <Grid item>
+                <TextField
+                  autoComplete={`email`}
+                  fullWidth
+                  name={`email`}
+                  required
+                  type={`email`}
+                  label={`Email`}
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={validations.email.error}
+                  helperText={validations.email.text}
+                  disabled={loading}
+                  size={`small`}
+                  variant={`outlined`}
+                />
+              </Grid>
 
-          <Grid item>
-            <Typography className={classes.headerText} variant={`h5`}>
-              Almost there
-            </Typography>
-          </Grid>
-
-          <Grid
-            item
-            container
-            className={classes.form}
-            component={`form`}
-            direction={`column`}
-            onSubmit={handleSignUp}
-            noValidate={false}
-            autoComplete={`on`}
-          >
-            <Grid item>
-              <TextField
-                name={`name`}
-                fullWidth
-                required
-                label={`Your name`}
-                value={formData.name}
-                onChange={handleChange}
-                error={validations.name.error}
-                helperText={validations.name.text}
-                disabled={loading}
-                size={`small`}
-                variant={`outlined`}
-              />
+              <Grid item>
+                <Button
+                  className={clsx(classes.button, classes.signUpButton)}
+                  fullWidth
+                  variant={`contained`}
+                  color={`primary`}
+                  type={`submit`}
+                  disabled={loading}
+                  size={`medium`}
+                >
+                  {`Sign up with email`}
+                </Button>
+              </Grid>
             </Grid>
+          </>
+        );
 
-            <Grid item>
-              <TextField
-                autoComplete={`new-password`}
-                fullWidth
-                name={`password`}
-                required
-                type={showPassword ? `text` : `password`}
-                label={`Password`}
-                value={formData.password}
-                onChange={handleChange}
-                error={validations.password.error}
-                helperText={
-                  validations.password.error
-                    ? validations.password.text
-                    : `At least 6 characters.`
-                }
-                disabled={loading}
-                size={`small`}
-                variant={`outlined`}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position={`end`}>
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        disabled={loading}
-                      >
-                        {showPassword ? (
-                          <VisibilityIcon />
-                        ) : (
-                          <VisibilityOffIcon />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-
+      case 'name-password':
+        return (
+          <>
             <Grid item>
               <Button
-                className={clsx(classes.button, classes.signUpButton)}
-                fullWidth
-                variant={`contained`}
-                color={`primary`}
-                type={`submit`}
-                disabled={loading}
-                size={`medium`}
+                className={clsx(classes.button, classes.backButton)}
+                onClick={() => setCurrentStep('email')}
+                startIcon={<ArrowBackIcon />}
+                size={`small`}
               >
-                {loading ? <CircularProgress size={28} /> : `Sign up now`}
+                {formData.email}
               </Button>
             </Grid>
-          </Grid>
-        </>
-      );
+
+            <Grid item>
+              <Typography className={classes.headerText} variant={`h5`}>
+                Almost there
+              </Typography>
+            </Grid>
+
+            <Grid
+              item
+              container
+              className={classes.form}
+              component={`form`}
+              direction={`column`}
+              onSubmit={handleSignUp}
+              noValidate={false}
+              autoComplete={`on`}
+            >
+              <Grid item>
+                <TextField
+                  name={`name`}
+                  fullWidth
+                  required
+                  label={`Your name`}
+                  value={formData.name}
+                  onChange={handleChange}
+                  error={validations.name.error}
+                  helperText={validations.name.text}
+                  disabled={loading}
+                  size={`small`}
+                  variant={`outlined`}
+                />
+              </Grid>
+
+              <Grid item>
+                <TextField
+                  autoComplete={`new-password`}
+                  fullWidth
+                  name={`password`}
+                  required
+                  type={showPassword ? `text` : `password`}
+                  label={`Password`}
+                  value={formData.password}
+                  onChange={handleChange}
+                  error={validations.password.error}
+                  helperText={
+                    validations.password.error
+                      ? validations.password.text
+                      : `At least 6 characters.`
+                  }
+                  disabled={loading}
+                  size={`small`}
+                  variant={`outlined`}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position={`end`}>
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          onMouseDown={(e) => e.preventDefault()}
+                          disabled={loading}
+                        >
+                          {showPassword ? (
+                            <VisibilityIcon />
+                          ) : (
+                            <VisibilityOffIcon />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item>
+                <Button
+                  className={clsx(classes.button, classes.signUpButton)}
+                  fullWidth
+                  variant={`contained`}
+                  color={`primary`}
+                  type={`submit`}
+                  disabled={loading}
+                  size={`medium`}
+                >
+                  {loading ? <CircularProgress size={28} /> : `Sign up now`}
+                </Button>
+              </Grid>
+            </Grid>
+          </>
+        );
+
+      default:
+        return null;
     }
   };
 
