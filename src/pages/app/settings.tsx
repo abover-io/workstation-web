@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, FormEventHandler } from 'react';
 import { NextPage } from 'next';
 import { useDispatch } from 'react-redux';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -22,6 +22,9 @@ import { withAuth } from '@/hocs';
 
 // Custom Hooks
 import { useAuth } from '@/hooks';
+
+// Redux Actions
+import { setUser as setUserRedux } from '@/redux/actions/auth';
 
 // Components
 import { AppLayout } from '@/components/app';
@@ -58,39 +61,73 @@ const SettingsPage: NextPage = () => {
     email: false,
     password: false,
   });
-  const [updateUserNameFormData, setUpdateUserNameFormData] =
+  const [updateNameFormData, setUpdateNameFormData] =
     useState<UpdateUserNameFormData>({
       name: '',
     });
-  const [updateUserEmailFormData, setUpdateUserEmailFormData] =
+  const [updateEmailFormData, setUpdateEmailFormData] =
     useState<UpdateUserEmailFormData>({
       email: '',
       password: '',
     });
-  const [updateUserPasswordFormData, setUpdateUserPasswordFormData] =
+  const [updatePasswordFormData, setUpdatePasswordFormData] =
     useState<UpdateUserPasswordFormData>({
       password: '',
       passwordConfirm: '',
       currentPassword: '',
     });
 
-  useEffect(() => {
-    if (user === null && auth.user !== null) {
-      setUser(auth.user);
-      setUpdateUserNameFormData({
-        name: auth.user.name,
-      });
-      setUpdateUserEmailFormData(
-        update(updateUserEmailFormData, {
-          email: {
-            $set: auth.user.email,
-          },
-        }),
-      );
-    }
+  // Async Change Handlers
+  const handleChangeName = useCallback<FormEventHandler<HTMLFormElement>>(
+    async (e) => {
+      try {
+        e.preventDefault();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth, user]);
+        setLoading(true);
+
+        await API.patch('/users/name', {
+          name: updateNameFormData.name,
+        });
+
+        setLoading(false);
+
+        setChanges(
+          update(changes, {
+            name: {
+              $set: false,
+            },
+          }),
+        );
+
+        dispatch(
+          setUserRedux(
+            update(auth.user, {
+              name: {
+                $set: updateNameFormData.name,
+              },
+            }),
+          ),
+        );
+      } catch (err) {
+        setLoading(false);
+      }
+    },
+    [updateNameFormData],
+  );
+  const handleChangeEmail = useCallback<FormEventHandler<HTMLFormElement>>(
+    async (e) => {
+      try {
+        setLoading(true);
+
+        await API.patch('/users/email', {});
+
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+      }
+    },
+    [updateEmailFormData],
+  );
 
   return (
     <AppLayout title='Settings'>
@@ -116,6 +153,7 @@ const SettingsPage: NextPage = () => {
               item
               container
               component='form'
+              onSubmit={handleChangeName}
               direction='column'
               spacing={2}
             >
@@ -129,10 +167,9 @@ const SettingsPage: NextPage = () => {
                 <TextField
                   fullWidth
                   required
-                  label='New Name'
-                  value={user?.name}
+                  label='New name'
                   onChange={(e) =>
-                    setUpdateUserNameFormData({
+                    setUpdateNameFormData({
                       name: e.target.value,
                     })
                   }
@@ -166,7 +203,7 @@ const SettingsPage: NextPage = () => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <Button variant='contained' color='primary'>
+                  <Button type='submit' variant='contained' color='primary'>
                     Save
                   </Button>
                 </Grid>
@@ -207,7 +244,7 @@ const SettingsPage: NextPage = () => {
               </Grid>
 
               <Grid item>
-                <Typography variant='subtitle2'>{user?.name}</Typography>
+                <Typography variant='subtitle2'>{auth.user?.name}</Typography>
               </Grid>
             </Grid>
           )}
@@ -232,10 +269,9 @@ const SettingsPage: NextPage = () => {
                   fullWidth
                   required
                   label='New Email'
-                  value={updateUserEmailFormData.email}
                   onChange={(e) =>
-                    setUpdateUserEmailFormData(
-                      update(updateUserEmailFormData, {
+                    setUpdateEmailFormData(
+                      update(updateEmailFormData, {
                         email: {
                           $set: e.target.value,
                         },
@@ -252,10 +288,9 @@ const SettingsPage: NextPage = () => {
                   fullWidth
                   required
                   label='Confirm Your Password'
-                  value={updateUserEmailFormData.password}
                   onChange={(e) =>
-                    setUpdateUserEmailFormData(
-                      update(updateUserEmailFormData, {
+                    setUpdateEmailFormData(
+                      update(updateEmailFormData, {
                         password: {
                           $set: e.target.value,
                         },
@@ -354,8 +389,8 @@ const SettingsPage: NextPage = () => {
                   required
                   label='New Password'
                   onChange={(e) =>
-                    setUpdateUserPasswordFormData(
-                      update(updateUserPasswordFormData, {
+                    setUpdatePasswordFormData(
+                      update(updatePasswordFormData, {
                         password: {
                           $set: e.target.value,
                         },
@@ -373,8 +408,8 @@ const SettingsPage: NextPage = () => {
                   required
                   label='Confirm New Password'
                   onChange={(e) =>
-                    setUpdateUserPasswordFormData(
-                      update(updateUserPasswordFormData, {
+                    setUpdatePasswordFormData(
+                      update(updatePasswordFormData, {
                         passwordConfirm: {
                           $set: e.target.value,
                         },
@@ -392,8 +427,8 @@ const SettingsPage: NextPage = () => {
                   required
                   label='Current Password'
                   onChange={(e) =>
-                    setUpdateUserPasswordFormData(
-                      update(updateUserPasswordFormData, {
+                    setUpdatePasswordFormData(
+                      update(updatePasswordFormData, {
                         currentPassword: {
                           $set: e.target.value,
                         },

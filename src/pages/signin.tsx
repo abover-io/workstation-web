@@ -12,7 +12,6 @@ import {
   IconButton,
   CircularProgress,
   Divider,
-  Paper,
 } from '@material-ui/core';
 import {
   VisibilityOff as VisibilityOffIcon,
@@ -26,6 +25,7 @@ import {
 import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 import update from 'immutability-helper';
+import { AxiosError } from 'axios';
 
 // API
 import api from '@/api';
@@ -141,7 +141,9 @@ const SignIn: FC<{}> = () => {
       }
 
       setLoading(false);
-    } catch (err) {
+    } catch (error) {
+      const err = error as AxiosError;
+
       setLoading(false);
 
       if (err.response) {
@@ -192,7 +194,7 @@ const SignIn: FC<{}> = () => {
       >
         <Grid item>
           <Typography className={classes.headerText} variant={`h5`}>
-            Sign in
+            Sign In
           </Typography>
         </Grid>
 
@@ -290,7 +292,7 @@ const SignIn: FC<{}> = () => {
                 disabled={loading}
                 size={`medium`}
               >
-                {loading ? <CircularProgress size={28} /> : `Sign in`}
+                {loading ? <CircularProgress size={28} /> : `Sign In`}
               </Button>
             </Grid>
 
