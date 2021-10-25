@@ -27,23 +27,20 @@ const Header: FC<{}> = () => {
   };
 
   return (
-    <AppBar position={`fixed`}>
+    <AppBar position='fixed'>
       <Toolbar>
-        <Typography
-          variant={`h6`}
-          style={{ flexGrow: 1 }}
-        >{`Fancy Todo`}</Typography>
+        <Typography variant='h6' style={{ flexGrow: 1 }}>
+          Fancy Todo
+        </Typography>
 
         {user ? (
-          <Button variant={`text`} color={`inherit`} onClick={handleGoToApp}>
-            {`Go to app`}
+          <Button variant='text' color='inherit' onClick={handleGoToApp}>
+            Go to App
           </Button>
         ) : (
-          <Button
-            variant={`outlined`}
-            color={`inherit`}
-            onClick={handleGetStarted}
-          >{`Get started`}</Button>
+          <Button variant='outlined' color='inherit' onClick={handleGetStarted}>
+            Get Started
+          </Button>
         )}
       </Toolbar>
     </AppBar>

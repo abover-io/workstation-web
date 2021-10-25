@@ -27,6 +27,7 @@ import {
 import { GoogleLoginButton } from 'react-social-login-buttons';
 import clsx from 'clsx';
 import update from 'immutability-helper';
+import { AxiosError } from 'axios';
 
 // Typings
 import { ISignUpFormData, ISignUpFormValidations } from '@/types/auth';
@@ -165,7 +166,8 @@ const SignUp: NextPage = () => {
 
         await router.push('/app');
       }
-    } catch (err) {
+    } catch (error) {
+      const err = error as AxiosError;
       setLoading(false);
 
       if (err.response) {
@@ -438,7 +440,7 @@ const SignUp: NextPage = () => {
             onClick={() => router.push('/signin')}
             size={`small`}
           >
-            Sign in
+            Sign Up
           </Button>
         </Grid>
       </Grid>
