@@ -38,7 +38,7 @@ const Home: FC<{}> = () => {
       >
         <Grid item>
           <Typography variant={`h2`} align={`center`} gutterBottom>
-            Fancy Todo
+            Todo
           </Typography>
 
           <Typography variant={`h5`} align={`center`} paragraph>
@@ -85,9 +85,9 @@ const Home: FC<{}> = () => {
           </Typography>
 
           <Typography variant={`subtitle1`} paragraph>
-            From day one, you can always see the source code of Fancy Todo, both
-            its web client and its API and upcoming cross platform apps of Fancy
-            Todo.
+            From day one, you can always see the source code of Sunday Todo,
+            both its web client and its API and upcoming cross platform apps of
+            Sunday Todo.
           </Typography>
         </Grid>
 
@@ -97,19 +97,19 @@ const Home: FC<{}> = () => {
           </Typography>
 
           <ButtonGroup size={`large`}>
-            <Tooltip title={`Fancy Todo on Web`}>
+            <Tooltip title={`Sunday Todo on Web`}>
               <IconButton>
                 <WebIcon fontSize={`large`} />
               </IconButton>
             </Tooltip>
 
-            <Tooltip title={`Fancy Todo on iOS (under development)`}>
+            <Tooltip title={`Sunday Todo on iOS (under development)`}>
               <IconButton>
                 <AppleIcon fontSize={`large`} />
               </IconButton>
             </Tooltip>
 
-            <Tooltip title={`Fancy Todo on Android (under development)`}>
+            <Tooltip title={`Sunday Todo on Android (under development)`}>
               <IconButton>
                 <AndroidIcon fontSize={`large`} />
               </IconButton>

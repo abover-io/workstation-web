@@ -30,7 +30,7 @@ const Header: FC<{}> = () => {
     <AppBar position='fixed'>
       <Toolbar>
         <Typography variant='h6' style={{ flexGrow: 1 }}>
-          Fancy Todo
+          Todo
         </Typography>
 
         {user ? (
