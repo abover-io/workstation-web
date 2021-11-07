@@ -87,7 +87,7 @@ const AppLayout: FC<AppLayoutProps> = ({ title, children }) => {
                   )}
 
                   <Typography className={classes.title} variant={`h6`}>
-                    Fancy Todo
+                    Todo
                   </Typography>
 
                   <UserHeaderMenu />

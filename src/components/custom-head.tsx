@@ -9,7 +9,7 @@ type CustomHeadProps = {
 const CustomHead: FC<CustomHeadProps> = ({ title, children }) => {
   return (
     <Head>
-      <title> {title ? `${title} | Fancy Todo` : 'Fancy Todo'} </title>
+      <title> {title ? `${title} | Todo` : 'Todo'} </title>
       {children}
     </Head>
   );
