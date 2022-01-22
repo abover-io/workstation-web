@@ -1,4 +1,5 @@
-import { FC, CSSProperties } from 'react';
+import { FC, useEffect, CSSProperties } from 'react';
+import { useRouter } from 'next/router';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   colors,
@@ -24,8 +25,17 @@ import MaterialUiIcon from '@/assets/icons/materialui-icon.svg';
 // Components
 import { Layout } from '@/components';
 
-const Home: FC<{}> = () => {
+const Home: FC = () => {
+  const router = useRouter();
   const classes = useStyles();
+
+  useEffect(() => {
+    if (router.pathname === '/') {
+      router.push({
+        pathname: '/app',
+      });
+    }
+  }, [router]);
 
   return (
     <Layout header footer>
