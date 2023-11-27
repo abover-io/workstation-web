@@ -46,7 +46,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.8",
     "@svgr/webpack": "^8.0.0",
-    "@types/cookie": "^0.5.0",
+    "@types/cookie": "^0.6.0",
     "@types/moment": "^2.13.0",
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
