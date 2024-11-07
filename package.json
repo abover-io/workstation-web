@@ -54,7 +54,7 @@
     "@types/redux": "^3.6.0",
     "babel-loader": "^9.0.0",
     "eslint": "9.14.0",
-    "eslint-config-next": "15.0.2",
+    "eslint-config-next": "15.0.3",
     "husky": "^9.0.0",
     "lint-staged": "^15.0.0",
     "npm-run-all2": "^7.0.0",
