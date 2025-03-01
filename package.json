@@ -52,7 +52,7 @@
     "@types/react": "^19.0.0",
     "@types/react-redux": "^7.1.23",
     "@types/redux": "^3.6.0",
-    "babel-loader": "^9.0.0",
+    "babel-loader": "^10.0.0",
     "eslint": "9.21.0",
     "eslint-config-next": "15.2.0",
     "husky": "^9.0.0",
