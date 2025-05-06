@@ -2032,9 +2032,9 @@
     moment "*"
 
 "@types/node@^22.0.0":
-  version "22.15.9"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.9.tgz#05a92409e7002356401df0b90267b296907937f7"
-  integrity sha512-l6QaCgJSJQ0HngL1TjvEY2DlefKggyGeXP1KYvYLBX41ZDPM1FsgDMAr5c+T673NMy7VCptMOzXOuJqf5uB0bA==
+  version "22.15.10"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.10.tgz#04dccc31c73ce3a8ea8cb9acce21878ddb9ded34"
+  integrity sha512-j2U4KRlgZ9Q8tVO/KDAvXu68vutX4kxoRysL6Q22oEU4ZFT2A16aIyqiIWAwFBZkvKep2UOcSGNoLe/6BI0nrg==
   dependencies:
     undici-types "~6.21.0"
 
