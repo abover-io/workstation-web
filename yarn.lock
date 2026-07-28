@@ -2534,10 +2534,10 @@ ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
-ansi-styles@^6.2.1:
-  version "6.2.3"
-  resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-6.2.3.tgz#c044d5dcc521a076413472597a1acb1f103c4041"
-  integrity sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==
+ansi-styles@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-7.0.0.tgz#859089a725560e235a41fecde8999196df6c78c0"
+  integrity sha512-kKvt3m4uwzqL0wlkPd09CmljPJGOZZ4D0fP65sqFSvPkMRKhNi+74MgIJ5QxE6SxqB4t4KyUFGg8+n5zjo6hew==
 
 argparse@^2.0.1:
   version "2.0.1"
@@ -4837,11 +4837,11 @@ npm-normalize-package-bin@^6.0.0:
   integrity sha512-tdt4aFn9QamlhdN3HV2D2ccpBwO5/fyjjbXUxYA6uBjyekMZcZvDq0aSj9t5Jo+tih6AYFnt/cuIRn9013e0Uw==
 
 npm-run-all2@^9.0.0:
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/npm-run-all2/-/npm-run-all2-9.0.2.tgz#20f84cae47f0de98041bfbdca40c6349340c0724"
-  integrity sha512-+dd4SO2jAlLE06OzmJKzIe6QvvjXezcbmobnh8usR0a8BzQCABTdqTXqVPji0ICOhSQpIIrkGd7IzNl5iDaRSA==
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/npm-run-all2/-/npm-run-all2-9.0.3.tgz#2e7f3979b30c019e5b2dbf846ec9aca1478a0c02"
+  integrity sha512-BQAEdU1PtYc48qYRdghW2BVTQT3VqWCoFQmO87NlM1h1PYwMCKQpUWaNyB20V26caNzFsXQDfyOdznLlHCih6g==
   dependencies:
-    ansi-styles "^6.2.1"
+    ansi-styles "^7.0.0"
     cross-spawn "^7.0.6"
     memorystream "^0.3.1"
     picomatch "^4.0.2"
@@ -5038,12 +5038,12 @@ picomatch@^2.3.1:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.2.tgz#5a942915e26b372dc0f0e6753149a16e6b1c5601"
   integrity sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==
 
-picomatch@^4.0.0, picomatch@^4.0.2:
+picomatch@^4.0.0:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.4.tgz#fd6f5e00a143086e074dffe4c924b8fb293b0589"
   integrity sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==
 
-picomatch@^4.0.4, picomatch@^4.0.5:
+picomatch@^4.0.2, picomatch@^4.0.4, picomatch@^4.0.5:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.5.tgz#51ea57a17d86f605f81039595fbc40ed06a55fab"
   integrity sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==
